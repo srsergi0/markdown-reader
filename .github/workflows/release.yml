@@ -25,14 +25,11 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build
-        run: bunx electrobun build --env stable
-
       - name: Install Inno Setup
         run: choco install innosetup -y
 
-      - name: Build installer
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss'
+      - name: Build and Package
+        run: bun run build:installer
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

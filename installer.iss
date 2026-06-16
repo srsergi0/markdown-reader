@@ -6,7 +6,7 @@
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Markdown Reader"
 #define MyAppURL "https://github.com/markdown-reader/markdown-reader"
-#define MyAppExeName "MarkdownReader.exe"
+#define MyAppExeName "bin\MarkdownReader.exe"
 
 [Setup]
 AppId={{B8F4B3A0-2C7D-4A1E-9D5F-8A3E6B2C1D0F}
@@ -33,7 +33,8 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "build\dev-win-x64\MarkdownReader-dev\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build\stable-win-x64\MarkdownReader\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "launcher.exe"
+Source: "build\stable-win-x64\MarkdownReader\bin\launcher.exe"; DestDir: "{app}\bin"; DestName: "MarkdownReader.exe"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"
