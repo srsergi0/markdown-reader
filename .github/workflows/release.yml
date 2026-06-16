@@ -25,27 +25,28 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build Electrobun (Windows)
+      - name: Build
         run: bunx electrobun build --env stable
 
-      - name: List all output
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Update installer version
         shell: pwsh
         run: |
-          Write-Host "=== Root directory ==="
-          Get-ChildItem -Path . -Directory | ForEach-Object { $_.Name }
-          Write-Host "=== build/ ==="
-          if (Test-Path build) { Get-ChildItem -Path build -Recurse -Depth 2 | ForEach-Object { $_.FullName } }
-          Write-Host "=== artifacts/ ==="
-          if (Test-Path artifacts) { Get-ChildItem -Path artifacts -Recurse | ForEach-Object { $_.FullName } }
+          $version = "${{ github.ref_name }}".Replace("v", "")
+          $content = Get-Content "installer.iss" -Raw
+          $content = $content -replace '#define MyAppVersion ".*"', "#define MyAppVersion `"$version`""
+          Set-Content "installer.iss" $content
+
+      - name: Build installer
+        run: & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-artifacts
-          path: |
-            build/**/*.zip
-            build/**/*.tar.zst
-            artifacts/*
+          name: windows-installer
+          path: installer/*.exe
 
   build-macos:
     runs-on: macos-latest
@@ -58,26 +59,23 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build Electrobun (macOS)
+      - name: Build
         run: bunx electrobun build --env stable
 
-      - name: List all output
+      - name: Create DMG
         run: |
-          echo "=== Root directory ==="
-          ls -d */ 2>/dev/null || true
-          echo "=== build/ ==="
-          find build -maxdepth 2 -type f 2>/dev/null || echo "no build/"
-          echo "=== artifacts/ ==="
-          find artifacts -type f 2>/dev/null || echo "no artifacts/"
+          APP_PATH=$(find build -name "*.app" -type d | head -1)
+          echo "Found: $APP_PATH"
+          hdiutil create -volname "Markdown Reader" \
+            -srcfolder "$APP_PATH" \
+            -ov -format UDZO \
+            "MarkdownReader-macOS.dmg"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-artifacts
-          path: |
-            build/**/*.dmg
-            build/**/*.app.tar.zst
-            artifacts/*
+          name: macos-dmg
+          path: "*.dmg"
 
   build-linux:
     runs-on: ubuntu-latest
@@ -90,46 +88,29 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build Electrobun (Linux)
+      - name: Build
         run: bunx electrobun build --env stable
 
-      - name: List all output
+      - name: Create tar.gz
         run: |
-          echo "=== Root directory ==="
-          ls -d */ 2>/dev/null || true
-          echo "=== build/ ==="
-          find build -maxdepth 2 -type f 2>/dev/null || echo "no build/"
-          echo "=== artifacts/ ==="
-          find artifacts -type f 2>/dev/null || echo "no artifacts/"
+          BUILD_DIR=$(find build -maxdepth 1 -type d -name "*linux*" | head -1)
+          INNER_DIR=$(find "$BUILD_DIR" -maxdepth 1 -type d | tail -1)
+          tar -czf MarkdownReader-Linux-x64.tar.gz -C "$BUILD_DIR" "$(basename $INNER_DIR)"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux-artifacts
-          path: |
-            build/**/*.tar.gz
-            build/**/*.tar.zst
-            artifacts/*
+          name: linux-tarball
+          path: "*.tar.gz"
 
   release:
     needs: [build-windows, build-macos, build-linux]
     runs-on: ubuntu-latest
     steps:
-      - name: Download all artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: all-artifacts
-
-      - name: Flatten artifacts
-        run: |
-          mkdir -p release-files
-          find all-artifacts -type f ! -name "*.json" ! -name "*.patch" | while read f; do
-            basename "$f"
-            cp "$f" release-files/
-          done
-
-      - name: List release files
-        run: ls -la release-files/
+          path: artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -139,4 +120,7 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-          files: release-files/*
+          files: |
+            artifacts/windows-installer/*
+            artifacts/macos-dmg/*
+            artifacts/linux-tarball/*
