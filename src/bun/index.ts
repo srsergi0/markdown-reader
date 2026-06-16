@@ -1,7 +1,7 @@
 import { BrowserWindow, BrowserView, Utils } from "electrobun/bun";
 import { watch, type FSWatcher } from "fs";
 import { readdir, readFile, access } from "fs/promises";
-import { join, basename, extname, relative } from "path";
+import { join, basename } from "path";
 import { tmpdir } from "os";
 import puppeteer from "puppeteer-core";
 import { buildPrintHTML } from "../shared/buildPrintHTML";
@@ -310,7 +310,7 @@ const url = await getMainViewUrl();
 const win = new BrowserWindow({
   title: "Markdown Reader",
   url,
-  titleBarStyle: "hidden",
+  titleBarStyle: "hiddenInset",
   frame: {
     width: 1000,
     height: 750,

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Search, X, File, ChevronRight, Loader2 } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 
 type SearchResult = {
   path: string;
@@ -17,7 +17,6 @@ type Props = {
 
 export default function SearchPanel({ folderPath, electroview, onSelectFile, onClose }: Props) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [grouped, setGrouped] = useState<Record<string, SearchResult[]>>({});
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,7 +28,6 @@ export default function SearchPanel({ folderPath, electroview, onSelectFile, onC
   const doSearch = useCallback(async (q: string) => {
     setQuery(q);
     if (!q.trim() || !folderPath || !electroview) {
-      setResults([]);
       setGrouped({});
       return;
     }
@@ -37,7 +35,6 @@ export default function SearchPanel({ folderPath, electroview, onSelectFile, onC
     try {
       const res = await electroview.proxy.request.searchInFolder({ path: folderPath, query: q });
       const items: SearchResult[] = res || [];
-      setResults(items);
       const g: Record<string, SearchResult[]> = {};
       for (const r of items) {
         if (!g[r.filename]) g[r.filename] = [];
@@ -45,7 +42,6 @@ export default function SearchPanel({ folderPath, electroview, onSelectFile, onC
       }
       setGrouped(g);
     } catch {
-      setResults([]);
       setGrouped({});
     }
     setLoading(false);

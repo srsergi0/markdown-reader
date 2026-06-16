@@ -1,9 +1,7 @@
-import { readdir, readFile, writeFile, mkdir } from "fs/promises";
-import { join, basename, relative } from "path";
-import { tmpdir } from "os";
+import { readdir, readFile, mkdir, access } from "fs/promises";
+import { join, relative } from "path";
 import puppeteer from "puppeteer-core";
 import { buildPrintHTML } from "../src/shared/buildPrintHTML";
-import { access } from "fs/promises";
 
 async function findChrome(): Promise<string | null> {
   const candidates = [

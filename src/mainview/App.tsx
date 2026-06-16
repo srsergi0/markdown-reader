@@ -262,7 +262,7 @@ function App() {
     }
     setSettingsMode(mode);
     setSettingsOpen(true);
-  }, []);
+  }, [handleSaveHtml]);
 
   const handleSaveHtml = useCallback(async () => {
     if (!activeContent) return;

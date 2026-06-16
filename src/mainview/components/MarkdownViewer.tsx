@@ -6,7 +6,6 @@ import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
-import matter from "gray-matter";
 import { useTheme } from "../App";
 import MermaidRenderer from "./MermaidRenderer";
 import { FileText } from "lucide-react";
