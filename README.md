@@ -4,10 +4,10 @@
 
 **A fast, native desktop Markdown reader built with [Electrobun](https://blackboard.sh/electrobun).**
 
-[![GitHub Release](https://img.shields.io/github/v/release/yourusername/markdown-reader?style=flat-square)](https://github.com/yourusername/markdown-reader/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/srsergi0/markdown-reader?style=flat-square)](https://github.com/srsergi0/markdown-reader/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/markdown-reader?style=flat-square)](https://github.com/yourusername/markdown-reader/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/yourusername/markdown-reader?style=flat-square)](https://github.com/yourusername/markdown-reader/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/srsergi0/markdown-reader?style=flat-square)](https://github.com/srsergi0/markdown-reader/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/srsergi0/markdown-reader?style=flat-square)](https://github.com/srsergi0/markdown-reader/issues)
 
 [Download](#installation) | [Features](#features) | [Development](#development) | [Contributing](#contributing)
 
@@ -46,13 +46,13 @@ Most Markdown editors are either web apps that feel slow or Electron apps that e
 
 ### Download
 
-Grab the latest release for your platform from the [Releases page](https://github.com/yourusername/markdown-reader/releases):
+Grab the latest release for your platform from the [Releases page](https://github.com/srsergi0/markdown-reader/releases):
 
 | Platform | Format | Link |
 |----------|--------|------|
-| Windows | `.exe` installer | [Download](https://github.com/yourusername/markdown-reader/releases/latest) |
-| macOS | `.dmg` | [Download](https://github.com/yourusername/markdown-reader/releases/latest) |
-| Linux | `.tar.gz` | [Download](https://github.com/yourusername/markdown-reader/releases/latest) |
+| Windows | `.exe` installer | [Download](https://github.com/srsergi0/markdown-reader/releases/latest) |
+| macOS | `.dmg` | [Download](https://github.com/srsergi0/markdown-reader/releases/latest) |
+| Linux | `.tar.gz` | [Download](https://github.com/srsergi0/markdown-reader/releases/latest) |
 
 ### Build from Source
 
@@ -61,7 +61,7 @@ Grab the latest release for your platform from the [Releases page](https://githu
 curl -fsSL https://bun.sh/install | bash
 
 # Clone and install
-git clone https://github.com/yourusername/markdown-reader.git
+git clone https://github.com/srsergi0/markdown-reader.git
 cd markdown-reader
 bun install
 
