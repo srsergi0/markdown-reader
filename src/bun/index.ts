@@ -257,6 +257,7 @@ const rpc = BrowserView.defineRPC<MarkdownReaderRPC>({
           if (browser) await browser.close();
           return null;
         }
+      },
       searchInFolder: async ({ path: folderPath, query }) => {
         const results: { path: string; filename: string; line: number; content: string }[] = [];
         const lowerQ = query.toLowerCase();
