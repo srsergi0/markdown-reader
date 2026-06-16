@@ -1,0 +1,8 @@
+node_modules/
+build/
+dist/
+artifacts/
+installer/
+*.tsbuildinfo
+.DS_Store
+Thumbs.db

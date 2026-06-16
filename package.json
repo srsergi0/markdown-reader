@@ -1,0 +1,48 @@
+{
+	"name": "markdown-reader",
+	"version": "1.0.0",
+	"description": "Native Markdown reader with file association support",
+	"scripts": {
+		"start": "vite build && electrobun dev",
+		"dev": "electrobun dev --watch",
+		"dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
+		"hmr": "vite --port 5173",
+		"build:canary": "vite build && electrobun build --env=canary",
+		"register": "powershell -ExecutionPolicy Bypass -File scripts/register-dev.ps1",
+		"build:installer": "vite build && electrobun build --env=stable && iscc installer.iss"
+	},
+	"dependencies": {
+		"@blocknote/core": "^0.51.4",
+		"@blocknote/mantine": "^0.51.4",
+		"@blocknote/react": "^0.51.4",
+		"@mantine/core": "^8.3.11",
+		"@mantine/hooks": "^8.3.11",
+		"electrobun": "1.18.1",
+		"gray-matter": "^4.0.3",
+		"lucide-react": "^1.18.0",
+		"mermaid": "^11.15.0",
+		"puppeteer-core": "^25.1.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-markdown": "^10.1.0",
+		"react-syntax-highlighter": "^16.1.1",
+		"rehype-stringify": "^10.0.1",
+		"remark-gfm": "^4.0.1",
+		"remark-parse": "^11.0.0",
+		"remark-rehype": "^11.1.2",
+		"unified": "^11.0.5"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/react": "^18.3.12",
+		"@types/react-dom": "^18.3.1",
+		"@vitejs/plugin-react": "^4.3.4",
+		"autoprefixer": "^10.4.20",
+		"concurrently": "^9.1.0",
+		"postcss": "^8.4.49",
+		"tailwindcss": "^3.4.16",
+		"@types/react-syntax-highlighter": "^15.5.13",
+		"typescript": "^5.7.2",
+		"vite": "^6.0.3"
+	}
+}
