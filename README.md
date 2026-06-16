@@ -48,11 +48,11 @@ Most Markdown editors are either web apps that feel slow or Electron apps that e
 
 Grab the latest release for your platform from the [Releases page](https://github.com/srsergi0/markdown-reader/releases):
 
-| Platform | Format | Link |
-|----------|--------|------|
-| Windows | `.exe` installer | [Download](https://github.com/srsergi0/markdown-reader/releases/latest) |
-| macOS | `.dmg` | [Download](https://github.com/srsergi0/markdown-reader/releases/latest) |
-| Linux | `.tar.gz` | [Download](https://github.com/srsergi0/markdown-reader/releases/latest) |
+| Platform | Format | Download |
+|----------|--------|----------|
+| **Windows** | `.zip` | [MarkdownReader-Windows-x64.zip](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Windows-x64.zip) |
+| **macOS** | `.zip` | [MarkdownReader-macOS.zip](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-macOS.zip) |
+| **Linux** | `.tar.gz` | [MarkdownReader-Linux-x64.tar.gz](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Linux-x64.tar.gz) |
 
 ### Build from Source
 
