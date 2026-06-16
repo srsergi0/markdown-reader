@@ -1,4 +1,4 @@
-﻿export type FileEntry = {
+export type FileEntry = {
   name: string;
   path: string;
   isDirectory: boolean;
@@ -20,6 +20,10 @@ export type MarkdownReaderRPC = {
       getFileContent: {
         params: { path: string };
         response: { content: string; filename: string };
+      };
+      resolvePath: {
+        params: { basePath: string; relativePath: string };
+        response: string;
       };
       startWatching: {
         params: { path: string };

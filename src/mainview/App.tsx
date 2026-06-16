@@ -279,6 +279,37 @@ function App() {
     }
   }, [activeContent, activeFile]);
 
+  const handleOpenLink = useCallback(
+    async (href: string) => {
+      if (!activeFile?.path) return;
+      const view = electroviewRef.current;
+      if (!view) return;
+      try {
+        const resolvedPath = await view.proxy.request.resolvePath({
+          basePath: activeFile.path,
+          relativePath: href,
+        });
+        const existing = tabs.find((t) => t.path === resolvedPath);
+        if (existing) {
+          setActiveTabId(existing.id);
+          setIsEditing(false);
+          return;
+        }
+        const result = await view.proxy.request.getFileContent({ path: resolvedPath });
+        if (!result) return;
+        const id = `tab-${++tabCounter}`;
+        setTabs((prev) => [...prev, { id, path: resolvedPath, filename: result.filename }]);
+        setActiveTabId(id);
+        setTabContents((prev) => ({ ...prev, [id]: result.content }));
+        setIsEditing(false);
+        view.proxy.request.startWatching({ path: resolvedPath });
+      } catch (err) {
+        console.error("Failed to open link:", err);
+      }
+    },
+    [activeFile, tabs],
+  );
+
   const handleReorderTabs = useCallback((fromIndex: number, toIndex: number) => {
     setTabs((prev) => {
       const next = [...prev];
@@ -513,7 +544,7 @@ function App() {
               {activeFile && isEditing ? (
                 <MarkdownEditor content={activeContent} onSave={handleSave} />
               ) : (
-                <MarkdownViewer content={activeContent} />
+                <MarkdownViewer content={activeContent} onOpenLink={handleOpenLink} />
               )}
             </main>
           </div>

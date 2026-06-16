@@ -12,6 +12,7 @@ import { FileText } from "lucide-react";
 
 type Props = {
   content: string;
+  onOpenLink?: (href: string) => void;
 };
 
 function CodeBlock({
@@ -47,7 +48,7 @@ function CodeBlock({
   );
 }
 
-export default function MarkdownViewer({ content }: Props) {
+export default function MarkdownViewer({ content, onOpenLink }: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const highlighterStyle = isDark ? oneDark : oneLight;
@@ -94,17 +95,31 @@ export default function MarkdownViewer({ content }: Props) {
         {children}
       </p>
     ),
-    a: ({ children, href, ...props }) => (
-      <a
-        href={href}
-        className="text-gray-900 dark:text-gray-100 underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:decoration-gray-900 dark:hover:decoration-gray-100"
-        target="_blank"
-        rel="noreferrer"
-        {...props}
-      >
-        {children}
-      </a>
-    ),
+    a: ({ children, href, ...props }) => {
+      const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (
+          href &&
+          (href.toLowerCase().endsWith(".md") || href.toLowerCase().endsWith(".markdown")) &&
+          !/^https?:\/\//i.test(href) &&
+          onOpenLink
+        ) {
+          e.preventDefault();
+          onOpenLink(href);
+        }
+      };
+      return (
+        <a
+          href={href}
+          onClick={handleClick}
+          className="text-gray-900 dark:text-gray-100 underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:decoration-gray-900 dark:hover:decoration-gray-100"
+          target={href && /^https?:\/\//i.test(href) ? "_blank" : undefined}
+          rel="noreferrer"
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    },
     ul: ({ children, ...props }) => (
       <ul className="list-disc pl-6 mb-3 space-y-1 text-gray-800 dark:text-gray-200" {...props}>
         {children}
