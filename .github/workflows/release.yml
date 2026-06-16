@@ -28,14 +28,24 @@ jobs:
       - name: Build Electrobun (Windows)
         run: bunx electrobun build --env stable
 
-      - name: List artifacts
-        run: Get-ChildItem -Path artifacts -Recurse
+      - name: List all output
+        shell: pwsh
+        run: |
+          Write-Host "=== Root directory ==="
+          Get-ChildItem -Path . -Directory | ForEach-Object { $_.Name }
+          Write-Host "=== build/ ==="
+          if (Test-Path build) { Get-ChildItem -Path build -Recurse -Depth 2 | ForEach-Object { $_.FullName } }
+          Write-Host "=== artifacts/ ==="
+          if (Test-Path artifacts) { Get-ChildItem -Path artifacts -Recurse | ForEach-Object { $_.FullName } }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
-          path: artifacts/*
+          path: |
+            build/**/*.zip
+            build/**/*.tar.zst
+            artifacts/*
 
   build-macos:
     runs-on: macos-latest
@@ -51,14 +61,23 @@ jobs:
       - name: Build Electrobun (macOS)
         run: bunx electrobun build --env stable
 
-      - name: List artifacts
-        run: ls -la artifacts/
+      - name: List all output
+        run: |
+          echo "=== Root directory ==="
+          ls -d */ 2>/dev/null || true
+          echo "=== build/ ==="
+          find build -maxdepth 2 -type f 2>/dev/null || echo "no build/"
+          echo "=== artifacts/ ==="
+          find artifacts -type f 2>/dev/null || echo "no artifacts/"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-artifacts
-          path: artifacts/*
+          path: |
+            build/**/*.dmg
+            build/**/*.app.tar.zst
+            artifacts/*
 
   build-linux:
     runs-on: ubuntu-latest
@@ -74,14 +93,23 @@ jobs:
       - name: Build Electrobun (Linux)
         run: bunx electrobun build --env stable
 
-      - name: List artifacts
-        run: ls -la artifacts/
+      - name: List all output
+        run: |
+          echo "=== Root directory ==="
+          ls -d */ 2>/dev/null || true
+          echo "=== build/ ==="
+          find build -maxdepth 2 -type f 2>/dev/null || echo "no build/"
+          echo "=== artifacts/ ==="
+          find artifacts -type f 2>/dev/null || echo "no artifacts/"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifacts
-          path: artifacts/*
+          path: |
+            build/**/*.tar.gz
+            build/**/*.tar.zst
+            artifacts/*
 
   release:
     needs: [build-windows, build-macos, build-linux]
