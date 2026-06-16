@@ -41,6 +41,7 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsMode, setSettingsMode] = useState<ExportMode>("print");
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const electroviewRef = useRef<any>(null);
   const activeTabRef = useRef<string | null>(null);
   const dragCounterRef = useRef(0);
