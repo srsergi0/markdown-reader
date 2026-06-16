@@ -25,17 +25,14 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Install Inno Setup
-        run: choco install innosetup -y
-
-      - name: Build and Package
-        run: bun run build:installer
+      - name: Build
+        run: bun run build:prod
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: installer/*.exe
+          path: build/stable-win-x64/*.zip
 
   build-macos:
     runs-on: macos-latest

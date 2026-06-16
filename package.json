@@ -9,7 +9,7 @@
 		"hmr": "vite --port 5173",
 		"build:canary": "vite build && electrobun build --env=canary",
 		"register": "powershell -ExecutionPolicy Bypass -File scripts/register-dev.ps1",
-		"build:installer": "vite build && electrobun build --env=stable && bun scripts/post-build-installer.ts"
+		"build:prod": "vite build && electrobun build --env=stable"
 	},
 	"dependencies": {
 		"@blocknote/core": "^0.51.4",
