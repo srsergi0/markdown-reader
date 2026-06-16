@@ -34,10 +34,10 @@ jobs:
       - name: Update installer version
         shell: pwsh
         run: |
-          $version = "${{ github.ref_name }}".Replace("v", "")
-          $content = Get-Content "installer.iss" -Raw
-          $content = $content -replace '#define MyAppVersion ".*"', "#define MyAppVersion `"$version`""
-          Set-Content "installer.iss" $content
+          $tag = "${{ github.ref_name }}"
+          if ($tag -eq "") { $tag = "${{ github.event.inputs.tag }}" }
+          $version = $tag.Replace("v", "")
+          (Get-Content "installer.iss") -replace 'define MyAppVersion ".*'", "define MyAppVersion `"$version`"" | Set-Content "installer.iss"
 
       - name: Build installer
         run: & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
@@ -115,8 +115,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name || github.event.inputs.tag }}
-          name: "Markdown Reader ${{ github.ref_name || github.event.inputs.tag }}"
+          tag_name: ${{ github.ref_name }}
+          name: "Markdown Reader ${{ github.ref_name }}"
           draft: false
           prerelease: false
           generate_release_notes: true
