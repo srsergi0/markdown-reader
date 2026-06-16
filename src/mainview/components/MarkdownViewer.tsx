@@ -124,8 +124,8 @@ function BreadcrumbSegment({
     >
       <button
         onClick={() => onSelect(item.id)}
-        className={`px-2 py-0.5 rounded transition-all text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100/50 dark:hover:bg-white/5 font-medium truncate max-w-[140px] text-xs ${
-          open ? "text-blue-500 dark:text-blue-400 bg-gray-100/50 dark:bg-white/5" : ""
+        className={`px-2 py-0.5 rounded transition-all text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-hover)] font-medium truncate max-w-[140px] text-xs ${
+          open ? "text-[var(--accent-blue)] bg-[var(--accent-hover)]" : ""
         }`}
       >
         {item.text}
@@ -134,7 +134,7 @@ function BreadcrumbSegment({
       {/* Segment Sibling Dropdown Menu */}
       {open && siblings.length > 1 && (
         <div 
-          className="absolute left-0 mt-1 min-w-[200px] max-w-[280px] bg-white/85 dark:bg-[#121214]/90 backdrop-blur-xl border border-gray-200/50 dark:border-white/5 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] p-1 z-50 animate-scale-in max-h-60 overflow-y-auto custom-scrollbar select-none flex flex-col gap-0.5"
+          className="absolute left-0 mt-1 min-w-[200px] max-w-[280px] bg-[var(--bg-sidebar)]/90 backdrop-blur-xl border border-[var(--border-main)] rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] p-1 z-50 animate-scale-in max-h-60 overflow-y-auto custom-scrollbar select-none flex flex-col gap-0.5"
           style={{ top: "100%" }}
         >
           {siblings.map((sibling) => {
@@ -148,12 +148,12 @@ function BreadcrumbSegment({
                 }}
                 className={`w-full text-left px-3 py-1.5 text-xs truncate rounded-lg transition-all duration-150 flex items-center justify-between hover:translate-x-0.5 ${
                   isSelf 
-                    ? "text-blue-500 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-500/10 font-semibold" 
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
+                    ? "text-[var(--accent-blue)] bg-[var(--accent-hover)] font-semibold" 
+                    : "text-[var(--text-main)] hover:bg-[var(--accent-hover)] hover:text-[var(--text-main)]"
                 }`}
               >
                 <span className="truncate">{sibling.text}</span>
-                {isSelf && <Check className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />}
+                {isSelf && <Check className="w-3.5 h-3.5 text-[var(--accent-blue)] shrink-0" />}
               </button>
             );
           })}
@@ -190,7 +190,7 @@ function CodeBlock({
     );
   }
   return (
-    <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-[13px]">
+    <code className="bg-[var(--bg-sidebar)] text-[var(--text-main)] px-1 py-0.5 rounded text-[13px] border border-[var(--border-main)]/50">
       {children}
     </code>
   );
@@ -305,7 +305,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       return (
         <h1
           id={id}
-          className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100 pb-2 border-b border-gray-100 dark:border-gray-800 scroll-mt-20"
+          className="text-3xl font-bold mt-8 mb-4 text-[var(--text-main)] pb-2 border-b border-[var(--border-main)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -318,7 +318,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       return (
         <h2
           id={id}
-          className="text-2xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100 pb-1 scroll-mt-20"
+          className="text-2xl font-bold mt-6 mb-3 text-[var(--text-main)] pb-1 scroll-mt-20"
           {...props}
         >
           {children}
@@ -331,7 +331,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       return (
         <h3
           id={id}
-          className="text-xl font-semibold mt-5 mb-2 text-gray-900 dark:text-gray-100 scroll-mt-20"
+          className="text-xl font-semibold mt-5 mb-2 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -344,7 +344,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       return (
         <h4
           id={id}
-          className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100 scroll-mt-20"
+          className="text-lg font-semibold mt-4 mb-2 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -357,7 +357,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       return (
         <h5
           id={id}
-          className="text-base font-semibold mt-3 mb-1 text-gray-900 dark:text-gray-100 scroll-mt-20"
+          className="text-base font-semibold mt-3 mb-1 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -370,7 +370,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       return (
         <h6
           id={id}
-          className="text-sm font-semibold mt-3 mb-1 text-gray-500 dark:text-gray-400 scroll-mt-20"
+          className="text-sm font-semibold mt-3 mb-1 text-[var(--text-muted)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -378,7 +378,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       );
     },
     p: ({ children, ...props }) => (
-      <p className="mb-3 leading-[1.7] text-gray-800 dark:text-gray-200" {...props}>
+      <p className="mb-3 leading-[1.7] text-[var(--text-main)]" {...props}>
         {children}
       </p>
     ),
@@ -398,7 +398,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         <a
           href={href}
           onClick={handleClick}
-          className="text-gray-900 dark:text-gray-100 underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:decoration-gray-900 dark:hover:decoration-gray-100"
+          className="text-[var(--accent-blue)] underline decoration-[var(--border-main)] underline-offset-2 hover:decoration-[var(--accent-blue)]"
           target={href && /^https?:\/\//i.test(href) ? "_blank" : undefined}
           rel="noreferrer"
           {...props}
@@ -408,12 +408,12 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       );
     },
     ul: ({ children, ...props }) => (
-      <ul className="list-disc pl-6 mb-3 space-y-1 text-gray-800 dark:text-gray-200" {...props}>
+      <ul className="list-disc pl-6 mb-3 space-y-1 text-[var(--text-main)]" {...props}>
         {children}
       </ul>
     ),
     ol: ({ children, ...props }) => (
-      <ol className="list-decimal pl-6 mb-3 space-y-1 text-gray-800 dark:text-gray-200" {...props}>
+      <ol className="list-decimal pl-6 mb-3 space-y-1 text-[var(--text-main)]" {...props}>
         {children}
       </ol>
     ),
@@ -424,7 +424,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
     ),
     blockquote: ({ children, ...props }) => (
       <blockquote
-        className="border-l-2 border-gray-300 dark:border-gray-600 pl-4 py-1 mb-3 text-gray-600 dark:text-gray-400"
+        className="border-l-2 border-[var(--border-main)] pl-4 py-1 mb-3 text-[var(--text-muted)]"
         {...props}
       >
         {children}
@@ -440,7 +440,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       }
       return (
         <code
-          className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-[13px] text-gray-900 dark:text-gray-100"
+          className="bg-[var(--bg-sidebar)] text-[var(--text-main)] px-1 py-0.5 rounded text-[13px] border border-[var(--border-main)]/50"
           {...props}
         >
           {children}
@@ -454,38 +454,38 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
     ),
     table: ({ children, ...props }) => (
       <div className="overflow-x-auto mb-3">
-        <table className="min-w-full border-collapse border border-gray-200 dark:border-gray-700" {...props}>
+        <table className="min-w-full border-collapse border border-[var(--border-main)]" {...props}>
           {children}
         </table>
       </div>
     ),
     thead: ({ children, ...props }) => (
-      <thead className="bg-gray-50 dark:bg-gray-800" {...props}>
+      <thead className="bg-[var(--bg-sidebar)]" {...props}>
         {children}
       </thead>
     ),
     tbody: ({ children, ...props }) => (
-      <tbody className="divide-y divide-gray-200 dark:divide-gray-700" {...props}>
+      <tbody className="divide-y divide-[var(--border-main)]" {...props}>
         {children}
       </tbody>
     ),
     tr: ({ children, ...props }) => (
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800" {...props}>
+      <tr className="hover:bg-[var(--accent-hover)]" {...props}>
         {children}
       </tr>
     ),
     th: ({ children, ...props }) => (
-      <th className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-left font-medium text-gray-900 dark:text-gray-100" {...props}>
+      <th className="border border-[var(--border-main)] px-3 py-1.5 text-left font-medium text-[var(--text-main)]" {...props}>
         {children}
       </th>
     ),
     td: ({ children, ...props }) => (
-      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-800 dark:text-gray-200" {...props}>
+      <td className="border border-[var(--border-main)] px-3 py-1.5 text-[var(--text-main)]" {...props}>
         {children}
       </td>
     ),
     hr: (props) => (
-      <hr className="my-6 border-gray-200 dark:border-gray-700" {...props} />
+      <hr className="my-6 border-[var(--border-main)]" {...props} />
     ),
     img: ({ src, alt, ...props }) => (
       <img
@@ -497,7 +497,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       />
     ),
     strong: ({ children, ...props }) => (
-      <strong className="font-semibold text-gray-900 dark:text-gray-100" {...props}>
+      <strong className="font-semibold text-[var(--text-main)]" {...props}>
         {children}
       </strong>
     ),
@@ -507,7 +507,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       </em>
     ),
     del: ({ children, ...props }) => (
-      <del className="line-through text-gray-500 dark:text-gray-400" {...props}>
+      <del className="line-through text-[var(--text-muted)]" {...props}>
         {children}
       </del>
     ),
@@ -531,7 +531,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       </details>
     ),
     summary: ({ children, ...props }) => (
-      <summary className="cursor-pointer font-medium text-gray-900 dark:text-gray-100 hover:text-gray-600 dark:hover:text-gray-300" {...props}>
+      <summary className="cursor-pointer font-medium text-[var(--text-main)] hover:text-[var(--text-muted)]" {...props}>
         {children}
       </summary>
     ),
@@ -539,7 +539,7 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
 
   if (!content) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 gap-4">
+      <div className="flex flex-col items-center justify-center h-full text-[var(--text-muted)] gap-4">
         <FileText className="w-12 h-12" strokeWidth={1.5} />
         <div className="text-center">
           <p className="text-sm">Drop a Markdown file here</p>
@@ -550,14 +550,14 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
   }
 
   return (
-    <div className="h-full w-full overflow-hidden relative bg-white dark:bg-[#191919]">
+    <div className="h-full w-full overflow-hidden relative bg-[var(--bg-editor)] text-[var(--text-main)]">
       {/* Floating Glass Breadcrumbs Bar */}
       {activePath.length > 0 && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-white/75 dark:bg-[#18181a]/80 backdrop-blur-md border border-gray-200 dark:border-gray-800/80 rounded-full px-4 py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.45)] select-none">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-[var(--bg-sidebar)]/85 backdrop-blur-md border border-[var(--border-main)] rounded-full px-4 py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.45)] select-none">
           {activePath.map((item, index) => (
             <div key={item.id} className="flex items-center gap-1.5">
               {index > 0 && (
-                <ChevronRight className="w-3.5 h-3.5 text-gray-450 dark:text-gray-600 shrink-0" />
+                <ChevronRight className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
               )}
               <BreadcrumbSegment
                 item={item}

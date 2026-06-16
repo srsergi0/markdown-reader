@@ -70,8 +70,8 @@ export default function ExportMenu({ onSelect, disabled }: Props) {
         aria-expanded={open}
         className={`p-2 rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-95 ${
           disabled
-            ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-            : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
+            ? "text-[var(--border-main)] cursor-not-allowed"
+            : "hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)]"
         }`}
       >
         <Printer className="w-4 h-4" />
@@ -80,7 +80,7 @@ export default function ExportMenu({ onSelect, disabled }: Props) {
         <div
           role="menu"
           aria-label="Export options"
-          className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-[#252525] border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 py-1"
+          className="absolute right-0 top-full mt-1 w-48 bg-[var(--bg-sidebar)] border border-[var(--border-main)] rounded-md shadow-lg z-50 py-1"
           onKeyDown={handleKeyDown}
         >
           {ITEMS.map((item, i) => {
@@ -91,9 +91,9 @@ export default function ExportMenu({ onSelect, disabled }: Props) {
                 ref={(el) => { itemsRef.current[i] = el; }}
                 role="menuitem"
                 onClick={() => handleItemClick(item.mode)}
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-blue-500"
+                className="w-full text-left px-3 py-2 text-sm text-[var(--text-main)] hover:bg-[var(--accent-hover)] flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-blue-500"
               >
-                <Icon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <Icon className="w-4 h-4 text-[var(--text-muted)]" />
                 {item.label}
               </button>
             );

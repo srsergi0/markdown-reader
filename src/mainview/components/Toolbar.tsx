@@ -1,10 +1,9 @@
 import ExportMenu from "./ExportMenu";
 import type { ExportMode } from "./SettingsModal";
-import { SidebarClose, SidebarOpen, File, FolderOpen, Eye, PenSquare, Sun, Moon } from "lucide-react";
+import { SidebarClose, SidebarOpen, File, FolderOpen, Eye, PenSquare } from "lucide-react";
+import ThemeMenu from "./ThemeMenu";
 
 type Props = {
-  theme: "light" | "dark";
-  onToggleTheme: () => void;
   onOpenFile: () => void;
   onOpenFolder: () => void;
   isEditing: boolean;
@@ -18,8 +17,6 @@ type Props = {
 const btn = "p-2 rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-95";
 
 export default function Toolbar({
-  theme,
-  onToggleTheme,
   onOpenFile,
   onOpenFolder,
   isEditing,
@@ -30,44 +27,44 @@ export default function Toolbar({
   onExportSelect,
 }: Props) {
   return (
-    <div className="flex items-center justify-between px-3 py-1.5 bg-white dark:bg-[#191919] border-b border-gray-200 dark:border-gray-800 select-none">
+    <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--bg-header)] border-b border-[var(--border-main)] select-none">
       <div className="flex items-center gap-1">
         <button
           onClick={onToggleSidebar}
           aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
           className={`${btn} ${
             sidebarOpen
-              ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
+              ? "bg-[var(--accent-hover)] text-[var(--accent-blue)]"
+              : "hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)]"
           }`}
         >
           {sidebarOpen ? <SidebarClose className="w-4 h-4" /> : <SidebarOpen className="w-4 h-4" />}
         </button>
-        <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1" aria-hidden="true" />
+        <div className="w-px h-5 bg-[var(--border-main)] mx-1" aria-hidden="true" />
         <button
           onClick={onOpenFile}
           aria-label="Open file"
-          className={`${btn} hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400`}
+          className={`${btn} hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)]`}
         >
           <File className="w-4 h-4" />
         </button>
         <button
           onClick={onOpenFolder}
           aria-label="Open folder"
-          className={`${btn} hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400`}
+          className={`${btn} hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)]`}
         >
           <FolderOpen className="w-4 h-4" />
         </button>
         {activeFile && (
           <>
-            <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1" aria-hidden="true" />
+            <div className="w-px h-5 bg-[var(--border-main)] mx-1" aria-hidden="true" />
             <button
               onClick={onToggleEdit}
               aria-label={isEditing ? "View rendered" : "Edit source"}
               className={`${btn} ${
                 isEditing
-                  ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
+                  ? "bg-[var(--accent-hover)] text-[var(--accent-blue)]"
+                  : "hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)]"
               }`}
             >
               {isEditing ? <Eye className="w-4 h-4" /> : <PenSquare className="w-4 h-4" />}
@@ -80,14 +77,8 @@ export default function Toolbar({
           onSelect={onExportSelect}
           disabled={!activeFile}
         />
-        <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
-        <button
-          onClick={onToggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          className={`${btn} hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400`}
-        >
-          {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
+        <div className="w-px h-5 bg-[var(--border-main)]" aria-hidden="true" />
+        <ThemeMenu />
       </div>
     </div>
   );

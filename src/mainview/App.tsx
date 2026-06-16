@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, createContext, useContext } from "react";
+import { useState, useCallback, useEffect, useRef, createContext, useContext, useMemo } from "react";
 import { Electroview } from "electrobun/view";
 import type { MarkdownReaderRPC, FileEntry } from "../shared/types";
 import MarkdownViewer from "./components/MarkdownViewer";
@@ -12,13 +12,35 @@ import Toast from "./components/Toast";
 import { printMarkdown, type PrintOptions } from "./utils/print";
 import { Upload } from "lucide-react";
 
+export type ThemeId =
+  | "github-light"
+  | "one-light"
+  | "solarized-light"
+  | "one-dark"
+  | "dracula"
+  | "github-dark"
+  | "nord"
+  | "tokyo-night"
+  | "gruvbox-dark"
+  | "rose-pine"
+  | "synthwave84"
+  | "night-owl"
+  | "ayu-light"
+  | "gruvbox-light"
+  | "everforest-light"
+  | "rose-pine-dawn";
+
 type ThemeContextType = {
   theme: "light" | "dark";
+  themeId: ThemeId;
+  setThemeId: (id: ThemeId) => void;
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "light",
+  theme: "dark",
+  themeId: "one-dark",
+  setThemeId: () => {},
   toggleTheme: () => {},
 });
 
@@ -27,8 +49,8 @@ export const useTheme = () => useContext(ThemeContext);
 let tabCounter = 0;
 
 function App() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    return (localStorage.getItem("md-reader-theme") as "light" | "dark") || "dark";
+  const [themeId, setThemeId] = useState<ThemeId>(() => {
+    return (localStorage.getItem("md-reader-theme-id") as ThemeId) || "one-dark";
   });
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -50,17 +72,51 @@ function App() {
 
   activeTabRef.current = activeTabId;
 
+  const darkThemes = useMemo<ThemeId[]>(() => [
+    "one-dark",
+    "dracula",
+    "github-dark",
+    "nord",
+    "tokyo-night",
+    "gruvbox-dark",
+    "rose-pine",
+    "synthwave84",
+    "night-owl",
+  ], []);
+  const isDark = darkThemes.includes(themeId);
+  const theme = isDark ? "dark" : "light";
+
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("md-reader-theme", next);
+    setThemeId((prev) => {
+      const currentIsDark = darkThemes.includes(prev);
+      const next = currentIsDark ? "github-light" : "one-dark";
+      localStorage.setItem("md-reader-theme-id", next);
       return next;
     });
+  }, [darkThemes]);
+
+  const handleSetThemeId = useCallback((id: ThemeId) => {
+    setThemeId(id);
+    localStorage.setItem("md-reader-theme-id", id);
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+    const root = document.documentElement;
+    // Remove all old theme classes
+    root.className = "";
+    // Toggle the dark class for Tailwind support
+    root.classList.toggle("dark", isDark);
+    // Add the new theme class
+    root.classList.add(`theme-${themeId}`);
+  }, [themeId, isDark]);
+
+  useEffect(() => {
+    if (!sidebarOpen && watchedFolderRef.current) {
+      lastFolderPath.current = watchedFolderRef.current;
+      watchedFolderRef.current = null;
+      electroviewRef.current?.proxy.request.stopWatchingFolder({}).catch(() => {});
+    }
+  }, [sidebarOpen]);
 
   useEffect(() => {
     const rpc = Electroview.defineRPC<MarkdownReaderRPC>({
@@ -446,11 +502,9 @@ function App() {
   );
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className="h-screen flex flex-col bg-white dark:bg-[#191919] text-gray-900 dark:text-gray-100">
+    <ThemeContext.Provider value={{ theme, themeId, setThemeId: handleSetThemeId, toggleTheme }}>
+      <div className="h-screen flex flex-col bg-[var(--bg-editor)] text-[var(--text-main)]">
         <TopBar
-          theme={theme}
-          onToggleTheme={toggleTheme}
           onOpenFile={handleOpenFile}
           onOpenFolder={handleOpenFolder}
           isEditing={isEditing}
@@ -501,21 +555,12 @@ function App() {
               onClose={() => setSearchOpen(false)}
             />
           )}
-          {sidebarOpen && (
-            <Sidebar
-              files={sidebarFiles}
-              activePath={activeFile?.path || null}
-              onSelectFile={handleSelectSidebarFile}
-              onClose={() => {
-                setSidebarOpen(false);
-                if (watchedFolderRef.current) {
-                  lastFolderPath.current = watchedFolderRef.current;
-                  watchedFolderRef.current = null;
-                  electroviewRef.current?.proxy.request.stopWatchingFolder({});
-                }
-              }}
-            />
-          )}
+  <Sidebar
+            open={sidebarOpen}
+            files={sidebarFiles}
+            activePath={activeFile?.path || null}
+            onSelectFile={handleSelectSidebarFile}
+          />
           <div
             className="flex-1 flex flex-col min-w-0 relative"
             onDragEnter={handleDragEnter}
@@ -524,8 +569,8 @@ function App() {
             onDrop={handleDrop}
           >
             {isDragOver && (
-              <div className="absolute inset-0 z-40 flex items-center justify-center bg-blue-500/10 dark:bg-blue-400/10 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg pointer-events-none">
-                <div className="flex flex-col items-center gap-2 text-blue-500 dark:text-blue-400">
+              <div className="absolute inset-0 z-40 flex items-center justify-center bg-[var(--accent-hover)] border-2 border-dashed border-[var(--accent-blue)] rounded-lg pointer-events-none">
+                <div className="flex flex-col items-center gap-2 text-[var(--accent-blue)]">
                   <Upload className="w-10 h-10" strokeWidth={1.5} />
                   <p className="text-sm font-medium">Drop markdown files or folders here</p>
                 </div>

@@ -86,7 +86,7 @@ export default function TabBar({
       ref={tabListRef}
       role="tablist"
       aria-label="Open files"
-      className="flex items-center bg-[#f7f7f5] dark:bg-[#191919] border-b border-gray-200 dark:border-gray-800 overflow-x-auto"
+      className="flex items-center bg-[var(--bg-sidebar)] border-b border-[var(--border-main)] overflow-x-auto"
     >
       {tabs.map((tab, index) => {
         const isActive = tab.id === activeTabId;
@@ -104,12 +104,12 @@ export default function TabBar({
             onDragStart={(e) => handleDragStart(e, index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
-            className={`group flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer border-r border-gray-200 dark:border-gray-800 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-[-2px] relative select-none ${
+            className={`group flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer border-r border-[var(--border-main)] whitespace-nowrap focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-[-2px] relative select-none ${
               isActive
-                ? "bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100"
-                : "bg-[#f7f7f5] dark:bg-[#191919] text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-[var(--bg-editor)] text-[var(--text-main)]"
+                : "bg-[var(--bg-sidebar)] text-[var(--text-muted)] hover:bg-[var(--accent-hover)] hover:text-[var(--text-main)]"
             } ${dragIndex === index ? "opacity-50" : ""}`}
-            style={isActive ? { boxShadow: "inset 0 -2px 0 #3b82f6" } : undefined}
+            style={isActive ? { boxShadow: "inset 0 -2px 0 var(--accent-blue)" } : undefined}
           >
             <File className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="max-w-32 truncate">{tab.filename}</span>
@@ -119,7 +119,7 @@ export default function TabBar({
                 onCloseTab(tab.id);
               }}
               aria-label={`Close ${tab.filename}`}
-              className="p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-opacity opacity-0 group-hover:opacity-100 focus-visible:opacity-100 active:scale-90"
+              className="p-0.5 rounded hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all opacity-0 group-hover:opacity-100 focus-visible:opacity-100 active:scale-90"
             >
               <X className="w-3 h-3" />
             </button>

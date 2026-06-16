@@ -65,16 +65,16 @@ export default function Modal({ open, onClose, title, children }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="bg-white dark:bg-[#252525] rounded-lg shadow-2xl w-full max-w-md mx-4 border border-gray-200 dark:border-gray-700 animate-scale-in"
+        className="bg-[var(--bg-sidebar)] rounded-lg shadow-2xl w-full max-w-md mx-4 border border-[var(--border-main)] animate-scale-in"
       >
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-main)]">
+          <h2 className="text-sm font-semibold text-[var(--text-main)]">
             {title}
           </h2>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500 transition-colors active:scale-95"
+            className="p-2 rounded-md hover:bg-[var(--accent-hover)] text-[var(--text-muted)] transition-colors active:scale-95"
           >
             <X className="w-4 h-4" />
           </button>

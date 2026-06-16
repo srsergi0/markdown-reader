@@ -48,7 +48,7 @@ const editorStyles = `
     font-weight: 600 !important;
     margin-top: 0.75rem !important;
     margin-bottom: 0.25rem !important;
-    color: #6b7280 !important;
+    color: var(--text-muted) !important;
   }
   .md-editor .bn-block-content[data-content-type="paragraph"] {
     line-height: 1.7 !important;
@@ -61,11 +61,11 @@ const editorStyles = `
     line-height: 1.7 !important;
   }
   .md-editor .bn-block-content[data-content-type="quote"] blockquote {
-    border-left: 2px solid #d1d5db !important;
+    border-left: 2px solid var(--border-main) !important;
     padding-left: 1rem !important;
     padding-block: 0.25rem !important;
     margin-bottom: 0.75rem !important;
-    color: #6b7280 !important;
+    color: var(--text-muted) !important;
   }
   .md-editor .bn-block-content[data-content-type="codeBlock"] {
     border-radius: 0.5rem !important;
@@ -78,7 +78,7 @@ const editorStyles = `
   }
   .md-editor .bn-block-content[data-content-type="table"] th,
   .md-editor .bn-block-content[data-content-type="table"] td {
-    border: 1px solid #d1d5db !important;
+    border: 1px solid var(--border-main) !important;
     padding: 0.375rem 0.75rem !important;
   }
   .md-editor .bn-block-content[data-content-type="table"] th {
@@ -89,14 +89,6 @@ const editorStyles = `
   }
   .md-editor .bn-block-content[data-content-type="divider"] hr {
     margin-block: 1.5rem !important;
-  }
-  .dark.md-editor .bn-block-content[data-content-type="quote"] blockquote {
-    border-left-color: #4b5563 !important;
-    color: #9ca3af !important;
-  }
-  .dark.md-editor .bn-block-content[data-content-type="table"] th,
-  .dark.md-editor .bn-block-content[data-content-type="table"] td {
-    border-color: #374151 !important;
   }
 `;
 
@@ -155,8 +147,8 @@ export default function MarkdownEditor({ content, onSave }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 z-10">
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex items-center justify-between px-4 py-2 bg-[var(--bg-header)] border-b border-[var(--border-main)] z-10">
+        <span className="text-sm text-[var(--text-muted)]">
           Editing
         </span>
         <div className="flex items-center gap-2">
@@ -168,7 +160,7 @@ export default function MarkdownEditor({ content, onSave }: Props) {
           <button
             onClick={handleSave}
             disabled={!hasChanges}
-            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1.5 text-sm bg-[var(--accent-blue)] text-white dark:text-[var(--bg-sidebar)] rounded hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
           >
             Save
           </button>

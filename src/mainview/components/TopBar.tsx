@@ -1,10 +1,9 @@
-import { Minus, Square, X, PanelLeft, PanelLeftClose, PanelLeftOpen, File, FolderOpen, Eye, PenSquare, Sun, Moon } from "lucide-react";
+import { Minus, Square, X, PanelLeft, PanelLeftClose, PanelLeftOpen, File, FolderOpen, Eye, PenSquare } from "lucide-react";
 import ExportMenu from "./ExportMenu";
 import type { ExportMode } from "./SettingsModal";
+import ThemeMenu from "./ThemeMenu";
 
 type Props = {
-  theme: "light" | "dark";
-  onToggleTheme: () => void;
   onOpenFile: () => void;
   onOpenFolder: () => void;
   isEditing: boolean;
@@ -22,8 +21,6 @@ const btn = "p-2 rounded-md transition-colors active:scale-95";
 const winBtn = "flex items-center justify-center w-[46px] h-full transition-colors active:scale-95";
 
 export default function TopBar({
-  theme,
-  onToggleTheme,
   onOpenFile,
   onOpenFolder,
   isEditing,
@@ -36,17 +33,16 @@ export default function TopBar({
   isMaximized,
   onMaximizedChange,
 }: Props) {
-  const isDark = theme === "dark";
-  const bg = isDark ? "bg-[#1a1a1a]" : "bg-white";
-  const border = isDark ? "border-b border-[#2a2a2a]" : "border-b border-gray-200";
-  const textColor = isDark ? "text-white" : "text-gray-900";
-  const iconColor = isDark ? "text-gray-400" : "text-gray-500";
-  const iconHover = isDark ? "hover:bg-white/10 hover:text-white" : "hover:bg-gray-100 hover:text-gray-900";
-  const activeBg = isDark ? "bg-white/10" : "bg-gray-100";
-  const winIcon = isDark ? "text-white/80 hover:text-white" : "text-gray-500 hover:text-gray-900";
-  const winHover = isDark ? "hover:bg-white/10" : "hover:bg-gray-100";
-  const closeHover = isDark ? "hover:bg-red-500/90" : "hover:bg-red-500";
-  const closeText = isDark ? "text-white/80 hover:text-white" : "text-gray-500 hover:text-white";
+  const bg = "bg-[var(--bg-header)]";
+  const border = "border-b border-[var(--border-main)]";
+  const textColor = "text-[var(--text-main)]";
+  const iconColor = "text-[var(--text-muted)]";
+  const iconHover = "hover:bg-[var(--accent-hover)] hover:text-[var(--text-main)]";
+  const activeBg = "bg-[var(--accent-hover)]";
+  const winIcon = "text-[var(--text-muted)] hover:text-[var(--text-main)]";
+  const winHover = "hover:bg-[var(--accent-hover)]";
+  const closeHover = "hover:bg-red-500/95";
+  const closeText = "text-[var(--text-muted)] hover:text-white";
 
   const handleMinimize = () => electroview?.proxy?.request?.minimizeWindow?.({});
   const handleMaximize = async () => {
@@ -76,7 +72,7 @@ export default function TopBar({
             </>
           )}
         </button>
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-0.5" aria-hidden="true" />
+        <div className="w-px h-4 bg-[var(--border-main)] mx-0.5" aria-hidden="true" />
         <button
           onClick={onOpenFile}
           aria-label="Open file"
@@ -95,7 +91,7 @@ export default function TopBar({
         </button>
         {activeFile && (
           <>
-            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-0.5" aria-hidden="true" />
+            <div className="w-px h-4 bg-[var(--border-main)] mx-0.5" aria-hidden="true" />
             <button
               onClick={onToggleEdit}
               aria-label={isEditing ? "View rendered" : "Edit source"}
@@ -109,15 +105,9 @@ export default function TopBar({
       </div>
       <div className="flex items-center h-full" style={{ appRegion: "no-drag" } as any}>
         <ExportMenu onSelect={onExportSelect} disabled={!activeFile} />
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" aria-hidden="true" />
-        <button
-          onClick={onToggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          className={`${btn} ${iconHover} ${iconColor}`}
-        >
-          {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" aria-hidden="true" />
+        <div className="w-px h-4 bg-[var(--border-main)] mx-1" aria-hidden="true" />
+        <ThemeMenu />
+        <div className="w-px h-4 bg-[var(--border-main)] mx-1" aria-hidden="true" />
         <button
           onClick={handleMinimize}
           aria-label="Minimize"

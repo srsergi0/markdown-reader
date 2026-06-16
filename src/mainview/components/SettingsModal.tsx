@@ -27,13 +27,13 @@ function Select({
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
         {label}
       </span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 block w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500"
+        className="mt-1 block w-full rounded-md border border-[var(--border-main)] bg-[var(--bg-editor)] px-3 py-1.5 text-sm text-[var(--text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-blue)]"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -60,9 +60,9 @@ function Checkbox({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="rounded border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-gray-400"
+        className="rounded border-[var(--border-main)] bg-[var(--bg-editor)] text-[var(--accent-blue)] focus:ring-[var(--accent-blue)]"
       />
-      <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
+      <span className="text-sm text-[var(--text-main)]">{label}</span>
     </label>
   );
 }
@@ -99,7 +99,7 @@ export default function SettingsModal({
     <Modal open={open} onClose={onClose} title={mode === "print" ? "Print" : "Save as PDF"}>
       <div className="space-y-4">
         {filename && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+          <div className="text-xs text-[var(--text-muted)] truncate">
             {filename}
           </div>
         )}
@@ -153,20 +153,20 @@ export default function SettingsModal({
           />
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-md px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="bg-[var(--bg-editor)] border border-[var(--border-main)] rounded-md px-3 py-2 text-xs text-[var(--text-muted)]">
           In the print dialog, uncheck <strong>"Headers and Footers"</strong> to hide date, title, and page number.
         </div>
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-main)]">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
+            className="px-3 py-1.5 text-sm rounded-md hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleAction}
-            className="px-3 py-1.5 text-sm rounded-md bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors font-medium"
+            className="px-3 py-1.5 text-sm rounded-md bg-[var(--accent-blue)] text-white dark:text-[var(--bg-sidebar)] hover:opacity-90 transition-colors font-medium shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
           >
             {mode === "print" ? "Print" : "Save as PDF"}
           </button>

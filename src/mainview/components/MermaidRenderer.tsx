@@ -120,20 +120,20 @@ export default function MermaidRenderer({ code }: Props) {
   return (
     <div className="my-3">
       <div className="flex items-center gap-1 mb-1 px-1">
-        <button onClick={zoomIn} aria-label="Zoom in" title="Zoom in" className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-90">
+        <button onClick={zoomIn} aria-label="Zoom in" title="Zoom in" className="p-2 rounded hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-90">
           <ZoomIn className="w-4 h-4" />
         </button>
-        <button onClick={zoomOut} aria-label="Zoom out" title="Zoom out" className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-90">
+        <button onClick={zoomOut} aria-label="Zoom out" title="Zoom out" className="p-2 rounded hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-90">
           <ZoomOut className="w-4 h-4" />
         </button>
-        <button onClick={resetView} aria-label="Reset view" title="Reset view" className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-90">
+        <button onClick={resetView} aria-label="Reset view" title="Reset view" className="p-2 rounded hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-90">
           <RotateCcw className="w-4 h-4" />
         </button>
-        <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">{Math.round(zoom * 100)}%</span>
+        <span className="text-xs text-[var(--text-muted)] ml-auto">{Math.round(zoom * 100)}%</span>
       </div>
       <div
         ref={containerRef}
-        className="relative overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900"
+        className="relative overflow-hidden border border-[var(--border-main)] rounded-lg bg-[var(--bg-editor)]"
         style={{ minHeight: "100px", userSelect: dragging.current ? "none" : undefined }}
       >
         <div
