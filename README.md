@@ -50,8 +50,8 @@ Grab the latest release for your platform from the [Releases page](https://githu
 
 | Platform | Format | Download |
 |----------|--------|----------|
-| **Windows** | `.zip` | [MarkdownReader-Windows-x64.zip](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Windows-x64.zip) |
-| **macOS** | `.zip` | [MarkdownReader-macOS.zip](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-macOS.zip) |
+| **Windows** | `.exe` installer | [MarkdownReader-Setup-1.0.0.exe](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Setup-1.0.0.exe) |
+| **macOS** | `.dmg` | [MarkdownReader-macOS.dmg](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-macOS.dmg) |
 | **Linux** | `.tar.gz` | [MarkdownReader-Linux-x64.tar.gz](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Linux-x64.tar.gz) |
 
 ### Build from Source
