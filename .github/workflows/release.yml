@@ -31,28 +31,29 @@ jobs:
       - name: Build Electrobun (Windows)
         run: bunx electrobun build --env stable
 
-      - name: List build output
-        run: |
-          Write-Host "=== build/ directory ==="
-          Get-ChildItem -Path build -Recurse -Depth 2 | ForEach-Object { $_.FullName }
+      - name: Install Inno Setup
+        run: choco install innosetup -y
 
-      - name: Create zip
+      - name: Prepare installer script
+        shell: pwsh
         run: |
-          $buildDir = Get-ChildItem -Path build -Directory | Where-Object { $_.Name -like "*win*" } | Select-Object -First 1
-          if (-not $buildDir) {
-            Write-Host "Available directories:"
-            Get-ChildItem -Path build -Directory | ForEach-Object { $_.Name }
-            throw "No Windows build directory found"
-          }
-          $zipName = "MarkdownReader-Windows-x64.zip"
-          Compress-Archive -Path "$($buildDir.FullName)\*" -DestinationPath $zipName
-          Write-Host "Created $zipName"
+          $version = "${{ github.ref_name }}".Replace("v", "")
+          $content = Get-Content "installer.iss" -Raw
+          $content = $content -replace '#define MyAppVersion ".*"', "#define MyAppVersion `"$version`""
+          # Fix source path to match actual build output
+          $content = $content -replace 'Source: "build\\stable-win-x64\\MarkdownReader\\\*"', 'Source: "build\dev-win-x64\MarkdownReader-dev\*"'
+          Set-Content "installer.iss" $content
+          Write-Host "Updated installer.iss with version $version"
+          Get-Content "installer.iss"
+
+      - name: Build installer
+        run: & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-zip
-          path: "*.zip"
+          name: windows-exe
+          path: installer/*.exe
 
   build-macos:
     runs-on: macos-latest
@@ -71,25 +72,25 @@ jobs:
       - name: Build Electrobun (macOS)
         run: bunx electrobun build --env stable
 
-      - name: List build output
-        run: find build -maxdepth 2 -type d
-
-      - name: Create zip
+      - name: Create DMG
         run: |
-          BUILD_DIR=$(find build -maxdepth 1 -type d -name "*macos*" | head -1)
-          if [ -z "$BUILD_DIR" ]; then
-            echo "Available directories:"
-            ls -la build/
-            echo "No macOS build directory found"
+          APP_PATH=$(find build -name "*.app" -type d | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found"
+            find build -maxdepth 3 -type d
             exit 1
           fi
-          zip -r MarkdownReader-macOS.zip "$BUILD_DIR"/*
+          echo "Found app: $APP_PATH"
+          hdiutil create -volname "Markdown Reader" \
+            -srcfolder "$APP_PATH" \
+            -ov -format UDZO \
+            "MarkdownReader-macOS.dmg"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-zip
-          path: "*.zip"
+          name: macos-dmg
+          path: "*.dmg"
 
   build-linux:
     runs-on: ubuntu-latest
@@ -108,16 +109,12 @@ jobs:
       - name: Build Electrobun (Linux)
         run: bunx electrobun build --env stable
 
-      - name: List build output
-        run: find build -maxdepth 2 -type d
-
       - name: Create tar.gz
         run: |
           BUILD_DIR=$(find build -maxdepth 1 -type d -name "*linux*" | head -1)
           if [ -z "$BUILD_DIR" ]; then
-            echo "Available directories:"
-            ls -la build/
             echo "No Linux build directory found"
+            ls -la build/
             exit 1
           fi
           tar -czf MarkdownReader-Linux-x64.tar.gz -C "$(dirname $BUILD_DIR)" "$(basename $BUILD_DIR)"
@@ -149,5 +146,6 @@ jobs:
           prerelease: false
           generate_release_notes: true
           files: |
-            artifacts/**/*.zip
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
             artifacts/**/*.tar.gz
