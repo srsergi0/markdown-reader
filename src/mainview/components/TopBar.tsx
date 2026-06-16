@@ -1,4 +1,4 @@
-import { Minus, Square, X, SidebarClose, SidebarOpen, File, FolderOpen, Eye, PenSquare, Sun, Moon } from "lucide-react";
+import { Minus, Square, X, PanelLeft, PanelLeftClose, PanelLeftOpen, File, FolderOpen, Eye, PenSquare, Sun, Moon } from "lucide-react";
 import ExportMenu from "./ExportMenu";
 import type { ExportMode } from "./SettingsModal";
 
@@ -61,10 +61,20 @@ export default function TopBar({
         <button
           onClick={onToggleSidebar}
           aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-          className={`${btn} ${sidebarOpen ? activeBg : iconHover} ${sidebarOpen ? textColor : iconColor}`}
+          className={`group ${btn} ${sidebarOpen ? activeBg : iconHover} ${sidebarOpen ? textColor : iconColor}`}
           style={{ appRegion: "no-drag" } as any}
         >
-          {sidebarOpen ? <SidebarClose className="w-4 h-4" /> : <SidebarOpen className="w-4 h-4" />}
+          {sidebarOpen ? (
+            <>
+              <PanelLeft className="w-4 h-4 group-hover:hidden" />
+              <PanelLeftClose className="w-4 h-4 hidden group-hover:block" />
+            </>
+          ) : (
+            <>
+              <PanelLeft className="w-4 h-4 group-hover:hidden" />
+              <PanelLeftOpen className="w-4 h-4 hidden group-hover:block" />
+            </>
+          )}
         </button>
         <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-0.5" aria-hidden="true" />
         <button
