@@ -255,15 +255,6 @@ function App() {
     [activeContent, activeFile],
   );
 
-  const handleOpenSettings = useCallback((mode: ExportMode) => {
-    if (mode === "save-html") {
-      handleSaveHtml();
-      return;
-    }
-    setSettingsMode(mode);
-    setSettingsOpen(true);
-  }, [handleSaveHtml]);
-
   const handleSaveHtml = useCallback(async () => {
     if (!activeContent) return;
     const view = electroviewRef.current;
@@ -278,6 +269,15 @@ function App() {
       console.error("Save HTML failed:", err);
     }
   }, [activeContent, activeFile]);
+
+  const handleOpenSettings = useCallback((mode: ExportMode) => {
+    if (mode === "save-html") {
+      handleSaveHtml();
+      return;
+    }
+    setSettingsMode(mode);
+    setSettingsOpen(true);
+  }, [handleSaveHtml]);
 
   const handleOpenLink = useCallback(
     async (href: string) => {
