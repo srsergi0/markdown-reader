@@ -460,6 +460,9 @@ function App() {
                   });
                 }
               } else if (e.isDirectory) {
+                if (e.name === "node_modules" || e.name.startsWith(".")) {
+                  continue;
+                }
                 const children = await buildTree(e as FileSystemDirectoryEntry);
                 result.push({
                   name: e.name,

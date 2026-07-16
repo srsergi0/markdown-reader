@@ -31,22 +31,35 @@ function TreeItem({
   const isSelected = activePath === entry.path;
 
   if (entry.isDirectory) {
+    const hasChildren = entry.children && entry.children.length > 0;
     return (
       <div role="treeitem" aria-expanded={expanded} className="flex flex-col">
         <button
-          onClick={() => setExpanded((p) => !p)}
-          onKeyDown={handleDirKeyDown}
-          className={`group w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition-all duration-200 hover:translate-x-0.5 focus-visible:outline-2 focus-visible:outline-blue-500 active:scale-[0.98] ${
+          onClick={() => {
+            if (hasChildren) {
+              setExpanded((p) => !p);
+            }
+          }}
+          onKeyDown={hasChildren ? handleDirKeyDown : undefined}
+          className={`group w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-blue-500 ${
             expanded
               ? "text-[var(--text-main)] font-medium"
               : "text-[var(--text-muted)]"
-          } hover:bg-[var(--accent-hover)] active:bg-[var(--accent-hover)]`}
+          } ${
+            hasChildren
+              ? "hover:bg-[var(--accent-hover)] active:bg-[var(--accent-hover)] hover:translate-x-0.5 active:scale-[0.98]"
+              : ""
+          }`}
         >
-          <ChevronRight
-            className={`w-3.5 h-3.5 flex-shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${
-              expanded ? "rotate-90 text-[var(--text-main)]" : ""
-            }`}
-          />
+          {hasChildren ? (
+            <ChevronRight
+              className={`w-3.5 h-3.5 flex-shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${
+                expanded ? "rotate-90 text-[var(--text-main)]" : ""
+              }`}
+            />
+          ) : (
+            <div className="w-3.5 h-3.5 flex-shrink-0" />
+          )}
           <Folder className="w-4 h-4 flex-shrink-0 text-amber-500 dark:text-amber-400 fill-amber-500/10 dark:fill-amber-400/5" />
           <span className="truncate">{entry.name}</span>
         </button>

@@ -58,10 +58,11 @@ async function scanDir(dir: string): Promise<FileEntry[]> {
     for (const item of sorted) {
       const fullPath = join(dir, item.name);
       if (item.isDirectory()) {
-        const children = await scanDir(fullPath);
-        if (children.length > 0) {
-          entries.push({ name: item.name, path: fullPath, isDirectory: true, children });
+        if (item.name === "node_modules" || item.name.startsWith(".")) {
+          continue;
         }
+        const children = await scanDir(fullPath);
+        entries.push({ name: item.name, path: fullPath, isDirectory: true, children });
       } else if (item.name.endsWith(".md") || item.name.endsWith(".markdown")) {
         entries.push({ name: item.name, path: fullPath, isDirectory: false });
       }
