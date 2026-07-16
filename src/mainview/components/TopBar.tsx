@@ -58,8 +58,20 @@ export default function TopBar({
   const handleClose = () => electroview?.proxy?.request?.closeWindow?.({});
 
   return (
-    <div className={`flex items-center h-[38px] ${bg} ${border} ${textColor} select-none`} style={{ appRegion: "drag" } as any}>
-      <div className="flex items-center gap-1 px-2 flex-1 min-w-0" style={{ appRegion: "drag" } as any}>
+    <div
+      className={`relative flex items-center h-[38px] ${bg} ${border} ${textColor} select-none`}
+      style={{ appRegion: "drag" } as any}
+    >
+      {/* Top resize border spacer (allows Windows window resizing from the top edge) */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[4px] z-50 cursor-ns-resize"
+        style={{ appRegion: "no-drag" } as any}
+      />
+
+      <div
+        className="flex items-center gap-1 px-2 flex-1 min-w-0"
+        style={{ appRegion: "drag" } as any}
+      >
         <button
           onClick={onToggleSidebar}
           aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}

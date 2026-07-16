@@ -73,6 +73,10 @@ export type MarkdownReaderRPC = {
         params: { markdown: string; filename: string };
         response: { path: string } | null;
       };
+      openExternalUrl: {
+        params: { url: string };
+        response: { success: boolean };
+      };
     };
     messages: {
       log: { msg: string };

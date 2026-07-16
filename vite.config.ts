@@ -1,10 +1,14 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import pkg from "./package.json";
 
 export default defineConfig({
 	base: "./",
 	plugins: [react()],
 	root: "src/mainview",
+	define: {
+		__APP_VERSION__: JSON.stringify(pkg.version),
+	},
 	build: {
 		outDir: "../../dist",
 		emptyOutDir: true,

@@ -4,7 +4,7 @@ export default {
 	app: {
 		name: "Markdown Reader",
 		identifier: "markdownreader.electrobun.dev",
-		version: "1.0.0",
+		version: "1.0.2",
 	},
 	build: {
 		copy: {

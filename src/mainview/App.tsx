@@ -9,8 +9,11 @@ import Sidebar from "./components/Sidebar";
 import SettingsModal, { type ExportMode } from "./components/SettingsModal";
 import SearchPanel from "./components/SearchPanel";
 import Toast from "./components/Toast";
+import UpdateToast from "./components/UpdateToast";
 import { printMarkdown, type PrintOptions } from "./utils/print";
 import { Upload } from "lucide-react";
+
+declare const __APP_VERSION__: string;
 
 export type ThemeId =
   | "github-light"
@@ -81,6 +84,7 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsMode, setSettingsMode] = useState<ExportMode>("print");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [updateInfo, setUpdateInfo] = useState<{ version: string; url: string } | null>(null);
   const [hasFolder, setHasFolder] = useState<boolean>(() => !!savedSession?.folderPath);
   const [workspacePath, setWorkspacePath] = useState<string | null>(() => savedSession?.folderPath || null);
   const [scrollTarget, setScrollTarget] = useState<{ path: string; line: number; timestamp: number } | null>(null);
@@ -242,13 +246,59 @@ function App() {
       }
     };
 
+    const isNewerVersion = (current: string, latest: string): boolean => {
+      const parse = (v: string) => v.split(".").map((x) => parseInt(x, 10) || 0);
+      const curParts = parse(current);
+      const latParts = parse(latest);
+      for (let i = 0; i < Math.max(curParts.length, latParts.length); i++) {
+        const cur = curParts[i] || 0;
+        const lat = latParts[i] || 0;
+        if (lat > cur) return true;
+        if (cur > lat) return false;
+      }
+      return false;
+    };
+
+    const checkForUpdates = async () => {
+      try {
+        const response = await fetch("https://api.github.com/repos/srsergi0/markdown-reader/releases/latest");
+        if (!response.ok) return;
+        const data = await response.json();
+        const latestVersion = data.tag_name;
+        if (!latestVersion) return;
+
+        const cleanLatest = latestVersion.replace(/^v/, "");
+        const cleanCurrent = __APP_VERSION__.replace(/^v/, "");
+
+        console.log("Update check:", { cleanCurrent, cleanLatest });
+
+        if (isNewerVersion(cleanCurrent, cleanLatest)) {
+          setUpdateInfo({
+            version: cleanLatest,
+            url: data.html_url || "https://github.com/srsergi0/markdown-reader/releases/latest"
+          });
+        }
+      } catch (e) {
+        console.error("Failed to check for updates:", e);
+      }
+    };
+
     initRestoredSession();
+    checkForUpdates();
 
     return () => {
       rpc.proxy.request.stopWatchingFolder({}).catch(() => {});
       rpc.proxy.request.stopWatching({}).catch(() => {});
     };
   }, []);
+
+  const handleDownloadUpdate = useCallback(() => {
+    if (updateInfo && electroviewRef.current) {
+      electroviewRef.current.proxy.request.openExternalUrl({ url: updateInfo.url }).catch((err: any) => {
+        console.error("Failed to open update url:", err);
+      });
+    }
+  }, [updateInfo]);
 
   const activeContent = activeTabId ? tabContents[activeTabId] || "" : "";
   const activeFile = tabs.find((t) => t.id === activeTabId) || null;
@@ -710,6 +760,13 @@ function App() {
         visible={toastMsg !== null}
         onDone={() => setToastMsg(null)}
       />
+      {updateInfo && (
+        <UpdateToast
+          latestVersion={updateInfo.version}
+          onDownload={handleDownloadUpdate}
+          onClose={() => setUpdateInfo(null)}
+        />
+      )}
     </ThemeContext.Provider>
   );
 }

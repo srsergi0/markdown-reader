@@ -327,6 +327,7 @@ const rpc = BrowserView.defineRPC<MarkdownReaderRPC>({
         win?.close();
         return {};
       },
+
       savePdf: async ({ markdown, filename, options }) => {
         let browser;
         try {
@@ -384,6 +385,15 @@ const rpc = BrowserView.defineRPC<MarkdownReaderRPC>({
         } catch (err) {
           console.error("Failed to save HTML:", err);
           return null;
+        }
+      },
+      openExternalUrl: async ({ url }) => {
+        try {
+          Utils.openExternal(url);
+          return { success: true };
+        } catch (err) {
+          console.error("Failed to open external URL:", err);
+          return { success: false };
         }
       },
     },

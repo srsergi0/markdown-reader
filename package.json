@@ -1,6 +1,6 @@
 {
 	"name": "markdown-reader",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Native Markdown reader with file association support",
 	"scripts": {
 		"start": "vite build && electrobun dev",
