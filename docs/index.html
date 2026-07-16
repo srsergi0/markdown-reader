@@ -196,21 +196,21 @@
 <div class="container">
   <!-- Hero / Pitch Panel -->
   <div class="panel">
-    <h1>MARKDOWN_READER</h1>
-    <div class="subtitle">LOCAL // INSTANT // PRIVACY_FIRST</div>
+    <h1 data-i18n="title">MARKDOWN_READER</h1>
+    <div class="subtitle" data-i18n="subtitle">LOCAL // INSTANT // PRIVACY_FIRST</div>
     
-    <p>In the era of AI, we generate summaries, documentations, and code reports faster than we can read them. Markdown Reader is a dedicated local viewer built to let you open, scan, and read markdown files immediately without waiting for heavy editors to launch.</p>
+    <p data-i18n="pitch">In the era of AI, we generate summaries, documentations, and code reports faster than we can read them. Markdown Reader is a dedicated local viewer built to let you open, scan, and read markdown files immediately without waiting for heavy editors to launch.</p>
     
     <!-- Primary CTA (Automatic OS Download) -->
     <div class="cta-container">
-      <a href="https://github.com/srsergi0/markdown-reader/releases" class="main-download-btn" id="cta-btn">
+      <a href="https://github.com/srsergi0/markdown-reader/releases" class="main-download-btn" id="cta-btn" data-i18n="dlRelease">
         DOWNLOAD_RELEASE
       </a>
       <div class="other-platforms">
-        Alternative packages: 
-        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-win">Windows (.zip)</a> // 
-        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-mac">macOS (.dmg)</a> // 
-        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-linux">Linux (.tar.gz)</a>
+        <span data-i18n="altLabel">Alternative packages:</span> 
+        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-win" data-i18n="altWin">Windows (.zip)</a> // 
+        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-mac" data-i18n="altMac">macOS (.dmg)</a> // 
+        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-linux" data-i18n="altLinux">Linux (.tar.gz)</a>
       </div>
     </div>
   </div>
@@ -218,26 +218,26 @@
   <!-- Benefits Panel -->
   <div class="panel">
     <div class="panel-header">
-      <span>WHY_MARKDOWN_READER</span>
-      <span>BENEFITS</span>
+      <span data-i18n="whyTitle">WHY_MARKDOWN_READER</span>
+      <span data-i18n="whySub">BENEFITS</span>
     </div>
 
     <div class="benefits-list">
       <div class="benefit-item">
-        <h3>[01] Focused Reading</h3>
-        <p>No editor toolbars, no markdown markdown-markup distractions. Just your rendered formatting, clean developer fonts, and smooth navigation.</p>
+        <h3 data-i18n="b1Title">[01] Focused Reading</h3>
+        <p data-i18n="b1Text">No editor toolbars, no markdown markdown-markup distractions. Just your rendered formatting, clean developer fonts, and smooth navigation.</p>
       </div>
       <div class="benefit-item">
-        <h3>[02] Zero Launch Delay</h3>
-        <p>Double-click any .md file and read it instantly. Launches in milliseconds by utilizing your operating system's native render viewports.</p>
+        <h3 data-i18n="b2Title">[02] Zero Launch Delay</h3>
+        <p data-i18n="b2Text">Double-click any .md file and read it instantly. Launches in milliseconds by utilizing your operating system's native render viewports.</p>
       </div>
       <div class="benefit-item">
-        <h3>[03] Privacy & Security</h3>
-        <p>100% offline. Read sensitive locally generated LLM summaries, code reviews, and databases securely without sending files to third-party web apps.</p>
+        <h3 data-i18n="b3Title">[03] Privacy & Security</h3>
+        <p data-i18n="b3Text">100% offline. Read sensitive locally generated LLM summaries, code reviews, and databases securely without sending files to third-party web apps.</p>
       </div>
       <div class="benefit-item">
-        <h3>[04] Developer Ready</h3>
-        <p>Built-in automatic formatting for standard markdown, syntax highlighting, and live rendering for Mermaid flowchart diagrams.</p>
+        <h3 data-i18n="b4Title">[04] Developer Ready</h3>
+        <p data-i18n="b4Text">Built-in automatic formatting for standard markdown, syntax highlighting, and live rendering for Mermaid flowchart diagrams.</p>
       </div>
     </div>
   </div>
@@ -245,34 +245,112 @@
   <!-- Quick Setup Info -->
   <div class="panel" id="setup">
     <div class="panel-header">
-      <span>SETUP_INSTRUCTIONS</span>
-      <span>GETTING_STARTED</span>
+      <span data-i18n="setupTitle">SETUP_INSTRUCTIONS</span>
+      <span data-i18n="setupSub">GETTING_STARTED</span>
     </div>
     
-    <p>For Windows, extract the archive and run: <code>bun run register</code> to enable double-click file associations. On macOS, copy the application to your Applications folder.</p>
+    <p id="setup-text-box">For Windows, extract the archive and run: <code>bun run register</code> to enable double-click file associations. On macOS, copy the application to your Applications folder.</p>
   </div>
 
   <!-- Footer -->
-  <footer>
+  <footer id="footer-elem">
     [MARKDOWN_READER] &copy; 2026 // MIT LICENSE // <a href="https://github.com/srsergi0/markdown-reader" style="color: var(--fg-muted);">source_code</a>
   </footer>
 </div>
 
 <script>
+  const translations = {
+    en: {
+      title: "MARKDOWN_READER",
+      subtitle: "LOCAL // INSTANT // PRIVACY_FIRST",
+      pitch: "In the era of AI, we generate summaries, documentations, and code reports faster than we can read them. Markdown Reader is a dedicated local viewer built to let you open, scan, and read markdown files immediately without waiting for heavy editors to launch.",
+      dlWin: "DOWNLOAD FOR WINDOWS",
+      dlMac: "DOWNLOAD FOR MACOS",
+      dlLin: "DOWNLOAD FOR LINUX",
+      dlRelease: "DOWNLOAD RELEASE",
+      altLabel: "Alternative packages:",
+      altWin: "Windows (.zip)",
+      altMac: "macOS (.dmg)",
+      altLinux: "Linux (.tar.gz)",
+      whyTitle: "WHY_MARKDOWN_READER",
+      whySub: "BENEFITS",
+      b1Title: "[01] Focused Reading",
+      b1Text: "No editor toolbars, no markdown markdown-markup distractions. Just your rendered formatting, clean developer fonts, and smooth navigation.",
+      b2Title: "[02] Zero Launch Delay",
+      b2Text: "Double-click any .md file and read it instantly. Launches in milliseconds by utilizing your operating system's native render viewports.",
+      b3Title: "[03] Privacy & Security",
+      b3Text: "100% offline. Read sensitive locally generated LLM summaries, code reviews, and databases securely without sending files to third-party web apps.",
+      b4Title: "[04] Developer Ready",
+      b4Text: "Built-in automatic formatting for standard markdown, syntax highlighting, and live rendering for Mermaid flowchart diagrams.",
+      setupTitle: "SETUP_INSTRUCTIONS",
+      setupSub: "GETTING_STARTED",
+      setupText: "For Windows, decompress the package and execute: <code>bun run register</code> to enable double-click file associations. On macOS, drag the application bundle to your Applications directory.",
+      footer: "[MARKDOWN_READER] &copy; 2026 // MIT LICENSE // <a href=\"https://github.com/srsergi0/markdown-reader\" style=\"color: var(--fg-muted);\">source_code</a>"
+    },
+    es: {
+      title: "MARKDOWN_READER",
+      subtitle: "LOCAL // INSTANTE // PRIVACIDAD_PRIMERO",
+      pitch: "En la era de la IA, generamos resúmenes, documentación e informes de código más rápido de lo que podemos leerlos. Markdown Reader es un visor local dedicado y diseñado para abrir, escanear y leer archivos markdown al instante, sin tener que esperar a que se carguen editores pesados.",
+      dlWin: "DESCARGAR PARA WINDOWS",
+      dlMac: "DESCARGAR PARA MACOS",
+      dlLin: "DESCARGAR PARA LINUX",
+      dlRelease: "DESCARGAR VERSIÓN",
+      altLabel: "Paquetes alternativos:",
+      altWin: "Windows (.zip)",
+      altMac: "macOS (.dmg)",
+      altLinux: "Linux (.tar.gz)",
+      whyTitle: "POR_QUÉ_MARKDOWN_READER",
+      whySub: "BENEFICIOS",
+      b1Title: "[01] Lectura Enfocada",
+      b1Text: "Sin barras de herramientas de edición ni distracciones de marcado de código. Solo tu formato renderizado, fuentes limpias de desarrollo y navegación fluida.",
+      b2Title: "[02] Cero Demoras al Iniciar",
+      b2Text: "Haz doble clic en cualquier archivo .md y léelo al instante. Se inicia en milisegundos gracias al motor de visualización nativo de tu sistema operativo.",
+      b3Title: "[03] Privacidad & Seguridad",
+      b3Text: "100% fuera de línea. Lee resúmenes de IA, revisiones de código y registros de base de datos de manera segura sin enviar tu información a servidores externos.",
+      b4Title: "[04] Listo para Desarrolladores",
+      b4Text: "Formateo automático integrado para markdown estándar (GFM), resaltado de sintaxis de código y renderizado de gráficos Mermaid en vivo.",
+      setupTitle: "INSTRUCCIONES_DE_INSTALACIÓN",
+      setupSub: "PRIMEROS_PASOS",
+      setupText: "Para Windows, extrae el archivo y ejecuta: <code>bun run register</code> para habilitar la asociación automática al hacer doble clic. En macOS, arrastra la aplicación a la carpeta de Aplicaciones.",
+      footer: "[MARKDOWN_READER] &copy; 2026 // LICENCIA MIT // <a href=\"https://github.com/srsergi0/markdown-reader\" style=\"color: var(--fg-muted);\">código_fuente</a>"
+    }
+  };
+
+  function getLang() {
+    const lang = window.navigator.language || window.navigator.userLanguage;
+    return lang.toLowerCase().startsWith('es') ? 'es' : 'en';
+  }
+
+  function applyLanguage(locale) {
+    const dict = translations[locale];
+    
+    // Process standard translations
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key]) {
+        el.innerText = dict[key];
+      }
+    });
+
+    // Special HTML inclusions
+    document.getElementById('setup-text-box').innerHTML = dict.setupText;
+    document.getElementById('footer-elem').innerHTML = dict.footer;
+  }
+
   function detectOS() {
     const userAgent = window.navigator.userAgent.toLowerCase();
     let os = 'win';
-    let label = 'DOWNLOAD FOR WINDOWS';
+    let labelKey = 'dlWin';
     
     if (userAgent.indexOf('mac') !== -1) {
       os = 'mac';
-      label = 'DOWNLOAD FOR MACOS';
+      labelKey = 'dlMac';
     } else if (userAgent.indexOf('linux') !== -1) {
       os = 'linux';
-      label = 'DOWNLOAD FOR LINUX';
+      labelKey = 'dlLin';
     }
     
-    return { os, label };
+    return { os, labelKey };
   }
 
   async function loadRelease() {
@@ -280,9 +358,12 @@
     const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
     const fallbackUrl = `https://github.com/${repo}/releases/latest`;
     
-    const { os, label } = detectOS();
+    const locale = getLang();
+    applyLanguage(locale);
+    
+    const { os, labelKey } = detectOS();
     const btn = document.getElementById('cta-btn');
-    btn.innerText = label;
+    btn.innerText = translations[locale][labelKey];
 
     try {
       const response = await fetch(apiUrl);
