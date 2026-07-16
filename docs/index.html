@@ -189,6 +189,23 @@
       color: var(--fg-muted);
       margin-top: 10px;
     }
+
+    .screenshot-container {
+      margin: 25px 0;
+      border: 1px solid var(--border);
+      background-color: #09090b;
+      padding: 4px;
+      transition: border-color 0.3s ease;
+    }
+    .screenshot-container:hover {
+      border-color: var(--border-focus);
+    }
+    .screenshot-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
@@ -198,6 +215,10 @@
   <div class="panel">
     <h1 data-i18n="title">MARKDOWN_READER</h1>
     <div class="subtitle" data-i18n="subtitle">LOCAL // INSTANT // PRIVACY_FIRST</div>
+
+    <div class="screenshot-container">
+      <img src="screenshot.png" alt="Markdown Reader Screenshot" class="screenshot-img" />
+    </div>
     
     <p data-i18n="pitch">In the era of AI, we generate summaries, documentations, and code reports faster than we can read them. Markdown Reader is a dedicated local viewer built to let you open, scan, and read markdown files immediately without waiting for heavy editors to launch.</p>
     

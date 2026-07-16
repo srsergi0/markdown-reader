@@ -16,6 +16,11 @@
 
 **[Download Now](https://srsergi0.github.io/markdown-reader/)** • **[Read Web Documentation](https://srsergi0.github.io/markdown-reader/)**
 
+<br />
+<br />
+
+![Markdown Reader Screenshot](docs/screenshot.png)
+
 ---
 
 </div>
