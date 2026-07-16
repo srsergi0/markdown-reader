@@ -1,126 +1,117 @@
-# Markdown Reader
+# ⚡️ Markdown Reader
 
 <div align="center">
 
-**A fast, native desktop Markdown reader built with [Electrobun](https://blackboard.sh/electrobun).**
+**A lightweight, native desktop Markdown viewer built for speed and privacy.**
 
-[![GitHub Release](https://img.shields.io/github/v/release/srsergi0/markdown-reader?style=flat-square)](https://github.com/srsergi0/markdown-reader/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/srsergi0/markdown-reader?style=flat-square)](https://github.com/srsergi0/markdown-reader/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/srsergi0/markdown-reader?style=flat-square)](https://github.com/srsergi0/markdown-reader/issues)
+[![GitHub Release](https://img.shields.io/github/v/release/srsergi0/markdown-reader?style=flat-square&color=22c55e)](https://github.com/srsergi0/markdown-reader/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/srsergi0/markdown-reader?style=flat-square&color=facc15)](https://github.com/srsergi0/markdown-reader/stargazers)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](LICENSE)
+[![Website](https://img.shields.io/badge/website-online-cyan?style=flat-square)](https://srsergi0.github.io/markdown-reader/)
 
-[Download](#installation) | [Features](#features) | [Development](#development) | [Contributing](#contributing)
+[Live Web Docs](https://srsergi0.github.io/markdown-reader/) // [Download Guide](#-downloads) // [Features](#-features) // [Development](#-development)
 
 </div>
 
 ---
 
-## Why Markdown Reader?
+### Why Markdown Reader?
 
-Most Markdown editors are either web apps that feel slow or Electron apps that eat your RAM. Markdown Reader is different:
+In the era of AI, we generate summaries, documentations, and code reports faster than we can read them. Markdown Reader is a local viewer designed to let you open, scan, and read markdown files immediately without waiting for heavy editors to launch.
 
-- **~14MB** bundle size (vs 150MB+ for Electron)
-- **<50ms** startup time (vs 2-5s for Electron)
-- **Native feel** — uses system WebView, not bundled Chromium
-- **File association** — double-click `.md` files to open them
-- **Real-time sync** — edits in external editors show up instantly
+*   🚀 **Launch in Milliseconds:** Starts in under 50ms (versus 2-5 seconds for Electron apps).
+*   📦 **Tiny Footprint:** Bundle size is under 14MB by leveraging your operating system's native WebViews.
+*   🔒 **100% Offline:** Read sensitive logs and local AI outputs securely—no cloud transmission.
+*   📎 **System Native:** Full support for file associations. Double-click any `.md` file to open it.
 
-## Features
+---
 
-| Feature | Description |
-|---------|-------------|
-| **Markdown Rendering** | Full GFM support, syntax highlighting, Mermaid diagrams |
-| **Live Reload** | File changes detected and reflected instantly |
-| **Folder Browser** | Browse and search entire documentation folders |
-| **Tab Support** | Open multiple files in tabs |
-| **Dark/Light Theme** | Toggle with persistence |
-| **Drag & Drop** | Drop files or folders directly onto the app |
-| **PDF Export** | Export to PDF with custom page size, margins, orientation |
-| **HTML Export** | Export standalone HTML files |
-| **Print** | Native print support with preview |
-| **Search** | Full-text search across folder contents (`Ctrl+Shift+F`) |
-| **Block Editor** | Optional WYSIWYG editing with BlockNote |
-| **Cross-Platform** | Windows, macOS, Linux |
+## ⚡️ Quick Start
 
-## Installation
+### Installation
 
-### Download
+Download the client directly for your operating system:
 
-Grab the latest release for your platform from the [Releases page](https://github.com/srsergi0/markdown-reader/releases):
+*   💾 **[Download for Windows](https://srsergi0.github.io/markdown-reader/#downloads)**
+*   🍎 **[Download for macOS](https://srsergi0.github.io/markdown-reader/#downloads)**
+*   🐧 **[Download for Linux](https://srsergi0.github.io/markdown-reader/#downloads)**
 
-| Platform | Format | Download |
-|----------|--------|----------|
-| **Windows** | `.exe` installer | [MarkdownReader-Setup-1.0.0.exe](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Setup-1.0.0.exe) |
-| **macOS** | `.dmg` | [MarkdownReader-macOS.dmg](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-macOS.dmg) |
-| **Linux** | `.tar.gz` | [MarkdownReader-Linux-x64.tar.gz](https://github.com/srsergi0/markdown-reader/releases/latest/download/MarkdownReader-Linux-x64.tar.gz) |
-
-### Build from Source
+Or install via source build in seconds:
 
 ```bash
-# Install Bun
-curl -fsSL https://bun.sh/install | bash
-
-# Clone and install
+# Clone the repository
 git clone https://github.com/srsergi0/markdown-reader.git
 cd markdown-reader
+
+# Install dependencies using Bun
 bun install
 
-# Build
-bun run build
-
-# Or build production release
+# Run dev server or build production
+bun run dev
 bun run build:prod
 ```
 
-## Development
+---
+
+## 🛠 Features
+
+| Feature | Details | Benefit |
+| :--- | :--- | :--- |
+| **Native Render** | Uses platform system WebViews, not Chromium | Consumes near-zero RAM |
+| **Realtime Sync** | Watches local file system events | Refreshes UI automatically on file updates |
+| **Mermaid Charts** | In-app Mermaid rendering | Renders flowcharts and graphs in-doc |
+| **Tabs & Navigation**| Multi-tab interface & sidebar browser | Navigate entire documentation folders |
+| **PDF Export** | Built-in PDF configuration layout | Clean physical prints and offline sharing |
+
+---
+
+## 💻 Development
 
 ```bash
-# Start with hot module replacement (recommended)
+# Start with hot module replacement (HMR)
 bun run dev:hmr
 
-# Start without HMR
-bun run dev
-
-# Build for production
-bun run build
+# Build the final application binaries
+bun run build:prod
 ```
 
-### How HMR Works
-
-1. Vite dev server starts on `localhost:5173`
-2. Electrobun detects the running server
-3. App loads from Vite instead of bundled assets
-4. React components update instantly on save
-
-## Project Structure
+### Project Structure
 
 ```
 markdown-reader/
 ├── src/
-│   ├── bun/              # Main process (Electrobun/Bun)
+│   ├── bun/              # Main process (Electrobun/Bun runtime)
 │   │   └── index.ts
-│   ├── mainview/         # React UI
+│   ├── mainview/         # React Frontend UI
 │   │   ├── App.tsx
-│   │   ├── components/   # UI components
-│   │   └── utils/        # Utilities
-│   └── shared/           # Shared types
-├── electrobun.config.ts  # App configuration
-├── vite.config.ts        # Vite configuration
+│   │   └── components/   # Modular UI elements
+│   └── shared/           # Type definitions shared between contexts
+├── docs/                 # Static documentation site (GitHub Pages)
+├── electrobun.config.ts  # Main configuration file
 └── package.json
 ```
 
-## Tech Stack
+### Technology Stack
 
-- **Runtime**: [Bun](https://bun.sh) — fast JavaScript runtime
-- **Framework**: [Electrobun](https://blackboard.sh/electrobun) — native desktop apps
-- **UI**: [React](https://react.dev) + [Tailwind CSS](https://tailwindcss.com)
-- **Build**: [Vite](https://vitejs.dev) — instant HMR
-- **Markdown**: [react-markdown](https://github.com/remarkjs/react-markdown) + remark/rehype plugins
+*   **Runtime:** [Bun](https://bun.sh)
+*   **Engine:** [Electrobun](https://blackboard.sh/electrobun)
+*   **UI Core:** [React](https://react.dev) + [Tailwind CSS](https://tailwindcss.com)
+*   **Build Server:** [Vite](https://vitejs.dev)
 
-## Contributing
+---
 
-Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) first.
+## 🤝 Contributing
 
-## License
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-[MIT](LICENSE)
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
