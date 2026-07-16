@@ -46,17 +46,34 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+const savedSession = (() => {
+  try {
+    const saved = localStorage.getItem("md-reader-session");
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+})();
+
 let tabCounter = 0;
+if (savedSession?.tabs) {
+  let maxIdNum = 0;
+  for (const tab of savedSession.tabs) {
+    const num = parseInt(tab.id.replace("tab-", ""), 10);
+    if (num > maxIdNum) maxIdNum = num;
+  }
+  tabCounter = maxIdNum;
+}
 
 function App() {
   const [themeId, setThemeId] = useState<ThemeId>(() => {
     return (localStorage.getItem("md-reader-theme-id") as ThemeId) || "one-dark";
   });
-  const [tabs, setTabs] = useState<Tab[]>([]);
-  const [activeTabId, setActiveTabId] = useState<string | null>(null);
+  const [tabs, setTabs] = useState<Tab[]>(() => savedSession?.tabs || []);
+  const [activeTabId, setActiveTabId] = useState<string | null>(() => savedSession?.activeTabId || null);
   const [tabContents, setTabContents] = useState<Record<string, string>>({});
-  const [isEditing, setIsEditing] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(() => !!savedSession?.isEditing);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => savedSession?.sidebarOpen ?? false);
   const [sidebarFiles, setSidebarFiles] = useState<FileEntry[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -64,7 +81,8 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsMode, setSettingsMode] = useState<ExportMode>("print");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [hasFolder, setHasFolder] = useState(false);
+  const [hasFolder, setHasFolder] = useState<boolean>(() => !!savedSession?.folderPath);
+  const [workspacePath, setWorkspacePath] = useState<string | null>(() => savedSession?.folderPath || null);
   const [scrollTarget, setScrollTarget] = useState<{ path: string; line: number; timestamp: number } | null>(null);
   const electroviewRef = useRef<any>(null);
   const activeTabRef = useRef<string | null>(null);
@@ -120,6 +138,20 @@ function App() {
     }
   }, [sidebarOpen]);
 
+  // Save session when relevant states change
+  useEffect(() => {
+    if (!electroviewRef.current) return;
+
+    const session = {
+      folderPath: workspacePath,
+      tabs,
+      activeTabId,
+      sidebarOpen,
+      isEditing,
+    };
+    localStorage.setItem("md-reader-session", JSON.stringify(session));
+  }, [tabs, activeTabId, sidebarOpen, isEditing, workspacePath]);
+
   useEffect(() => {
     const rpc = Electroview.defineRPC<MarkdownReaderRPC>({
       maxRequestTime: 30000,
@@ -161,6 +193,57 @@ function App() {
     });
     new Electroview({ rpc });
     electroviewRef.current = rpc;
+
+    // Load content for restored tabs and set up watchers
+    const initRestoredSession = async () => {
+      if (savedSession) {
+        const { folderPath, tabs: savedTabs, activeTabId: savedActiveTabId } = savedSession;
+
+        if (folderPath) {
+          try {
+            const files = await rpc.proxy.request.readFolder({ path: folderPath });
+            setSidebarFiles(files);
+            watchedFolderRef.current = folderPath;
+            lastFolderPath.current = folderPath;
+            
+            if (sidebarOpen) {
+              rpc.proxy.request.startWatchingFolder({ path: folderPath }).catch(() => {});
+            }
+          } catch (e) {
+            console.error("Failed to restore folder files:", e);
+          }
+        }
+
+        if (savedTabs && savedTabs.length > 0) {
+          const contents: Record<string, string> = {};
+          await Promise.all(
+            savedTabs.map(async (tab: any) => {
+              try {
+                const res = await rpc.proxy.request.getFileContent({ path: tab.path });
+                if (res) {
+                  contents[tab.id] = res.content;
+                }
+              } catch (e) {
+                console.error("Failed to restore tab content:", tab.path, e);
+              }
+            })
+          );
+          
+          setTabContents((prev) => ({ ...contents, ...prev }));
+
+          // Watch active file, only if it's still the active tab
+          if (savedActiveTabId && activeTabRef.current === savedActiveTabId) {
+            const activeTab = savedTabs.find((t: any) => t.id === savedActiveTabId);
+            if (activeTab) {
+              rpc.proxy.request.startWatching({ path: activeTab.path }).catch(() => {});
+            }
+          }
+        }
+      }
+    };
+
+    initRestoredSession();
+
     return () => {
       rpc.proxy.request.stopWatchingFolder({}).catch(() => {});
       rpc.proxy.request.stopWatching({}).catch(() => {});
@@ -197,6 +280,7 @@ function App() {
     watchedFolderRef.current = folderPath;
     lastFolderPath.current = folderPath;
     setHasFolder(true);
+    setWorkspacePath(folderPath);
     view.proxy.request.startWatchingFolder({ path: folderPath });
   }, []);
 
@@ -484,10 +568,11 @@ function App() {
           };
 
           const tree = await buildTree(entry as FileSystemDirectoryEntry);
-           electroviewRef.current?.proxy.request.stopWatchingFolder({});
+          electroviewRef.current?.proxy.request.stopWatchingFolder({});
           watchedFolderRef.current = null;
           lastFolderPath.current = null;
           setHasFolder(false);
+          setWorkspacePath(null);
           setSidebarFiles([{ name: entry.name, isDirectory: true, path: entry.name, children: tree }]);
           setSidebarOpen(true);
         } else {
