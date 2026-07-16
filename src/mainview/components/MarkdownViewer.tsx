@@ -14,6 +14,7 @@ import { FileText, ChevronRight, Check } from "lucide-react";
 type Props = {
   content: string;
   onOpenLink?: (href: string) => void;
+  scrollToLine?: { line: number; timestamp: number } | null;
 };
 
 type HeadingItem = {
@@ -196,7 +197,7 @@ function CodeBlock({
   );
 }
 
-export default function MarkdownViewer({ content, onOpenLink }: Props) {
+export default function MarkdownViewer({ content, onOpenLink, scrollToLine }: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const highlighterStyle = isDark ? oneDark : oneLight;
@@ -209,6 +210,52 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
   // Ref to lock scroll spy during smooth scroll navigation
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Scroll to targeted line from search result click
+  useEffect(() => {
+    if (scrollToLine && scrollContainerRef.current) {
+      const line = scrollToLine.line;
+      const container = scrollContainerRef.current;
+      // Find all elements with data-line attribute
+      const elements = Array.from(container.querySelectorAll("[data-line]"));
+      if (elements.length === 0) return;
+
+      // Find the closest element that starts at or before the target line
+      let closestEl: HTMLElement | null = null;
+      let closestDiff = Infinity;
+
+      for (const el of elements) {
+        const elLine = parseInt(el.getAttribute("data-line") || "0", 10);
+        if (elLine > 0) {
+          const diff = line - elLine;
+          if (diff >= 0 && diff < closestDiff) {
+            closestDiff = diff;
+            closestEl = el as HTMLElement;
+          }
+        }
+      }
+
+      // Fallback: if we didn't find any element starting before it, use the first element
+      if (!closestEl && elements.length > 0) {
+        closestEl = elements[0] as HTMLElement;
+      }
+
+      if (closestEl) {
+        // Scroll element to center of screen
+        closestEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // Highlight matching block element with pulse animation
+        closestEl.classList.remove("highlight-pulse");
+        void closestEl.offsetWidth; // Trigger reflow to restart animation
+        closestEl.classList.add("highlight-pulse");
+        
+        const targetEl = closestEl;
+        setTimeout(() => {
+          targetEl.classList.remove("highlight-pulse");
+        }, 2500);
+      }
+    }
+  }, [scrollToLine]);
 
   const handleScroll = useCallback(() => {
     if (isScrollingRef.current) return;
@@ -299,12 +346,13 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
   }, []);
 
   const components: Components = {
-    h1: ({ children, ...props }) => {
+    h1: ({ node, children, ...props }) => {
       const text = getHeadingText(children);
       const id = getHeadingId(text);
       return (
         <h1
           id={id}
+          data-line={node?.position?.start?.line}
           className="text-3xl font-bold mt-8 mb-4 text-[var(--text-main)] pb-2 border-b border-[var(--border-main)] scroll-mt-20"
           {...props}
         >
@@ -312,12 +360,13 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </h1>
       );
     },
-    h2: ({ children, ...props }) => {
+    h2: ({ node, children, ...props }) => {
       const text = getHeadingText(children);
       const id = getHeadingId(text);
       return (
         <h2
           id={id}
+          data-line={node?.position?.start?.line}
           className="text-2xl font-bold mt-6 mb-3 text-[var(--text-main)] pb-1 scroll-mt-20"
           {...props}
         >
@@ -325,12 +374,13 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </h2>
       );
     },
-    h3: ({ children, ...props }) => {
+    h3: ({ node, children, ...props }) => {
       const text = getHeadingText(children);
       const id = getHeadingId(text);
       return (
         <h3
           id={id}
+          data-line={node?.position?.start?.line}
           className="text-xl font-semibold mt-5 mb-2 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
@@ -338,12 +388,13 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </h3>
       );
     },
-    h4: ({ children, ...props }) => {
+    h4: ({ node, children, ...props }) => {
       const text = getHeadingText(children);
       const id = getHeadingId(text);
       return (
         <h4
           id={id}
+          data-line={node?.position?.start?.line}
           className="text-lg font-semibold mt-4 mb-2 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
@@ -351,12 +402,13 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </h4>
       );
     },
-    h5: ({ children, ...props }) => {
+    h5: ({ node, children, ...props }) => {
       const text = getHeadingText(children);
       const id = getHeadingId(text);
       return (
         <h5
           id={id}
+          data-line={node?.position?.start?.line}
           className="text-base font-semibold mt-3 mb-1 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
@@ -364,12 +416,13 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </h5>
       );
     },
-    h6: ({ children, ...props }) => {
+    h6: ({ node, children, ...props }) => {
       const text = getHeadingText(children);
       const id = getHeadingId(text);
       return (
         <h6
           id={id}
+          data-line={node?.position?.start?.line}
           className="text-sm font-semibold mt-3 mb-1 text-[var(--text-muted)] scroll-mt-20"
           {...props}
         >
@@ -377,12 +430,12 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </h6>
       );
     },
-    p: ({ children, ...props }) => (
-      <p className="mb-3 leading-[1.7] text-[var(--text-main)]" {...props}>
+    p: ({ node, children, ...props }) => (
+      <p data-line={node?.position?.start?.line} className="mb-3 leading-[1.7] text-[var(--text-main)]" {...props}>
         {children}
       </p>
     ),
-    a: ({ children, href, ...props }) => {
+    a: ({ node, children, href, ...props }) => {
       const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (
           href &&
@@ -407,30 +460,31 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </a>
       );
     },
-    ul: ({ children, ...props }) => (
-      <ul className="list-disc pl-6 mb-3 space-y-1 text-[var(--text-main)]" {...props}>
+    ul: ({ node, children, ...props }) => (
+      <ul data-line={node?.position?.start?.line} className="list-disc pl-6 mb-3 space-y-1 text-[var(--text-main)]" {...props}>
         {children}
       </ul>
     ),
-    ol: ({ children, ...props }) => (
-      <ol className="list-decimal pl-6 mb-3 space-y-1 text-[var(--text-main)]" {...props}>
+    ol: ({ node, children, ...props }) => (
+      <ol data-line={node?.position?.start?.line} className="list-decimal pl-6 mb-3 space-y-1 text-[var(--text-main)]" {...props}>
         {children}
       </ol>
     ),
-    li: ({ children, ...props }) => (
-      <li className="leading-[1.7]" {...props}>
+    li: ({ node, children, ...props }) => (
+      <li data-line={node?.position?.start?.line} className="leading-[1.7]" {...props}>
         {children}
       </li>
     ),
-    blockquote: ({ children, ...props }) => (
+    blockquote: ({ node, children, ...props }) => (
       <blockquote
+        data-line={node?.position?.start?.line}
         className="border-l-2 border-[var(--border-main)] pl-4 py-1 mb-3 text-[var(--text-muted)]"
         {...props}
       >
         {children}
       </blockquote>
     ),
-    code: ({ className, children, ...props }) => {
+    code: ({ node, className, children, ...props }) => {
       if (className) {
         return (
           <CodeBlock className={className} style={highlighterStyle}>
@@ -447,48 +501,49 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         </code>
       );
     },
-    pre: ({ children, ...props }) => (
-      <pre className="mb-3 rounded-lg overflow-x-auto" {...props}>
+    pre: ({ node, children, ...props }) => (
+      <pre data-line={node?.position?.start?.line} className="mb-3 rounded-lg overflow-x-auto" {...props}>
         {children}
       </pre>
     ),
-    table: ({ children, ...props }) => (
-      <div className="overflow-x-auto mb-3">
+    table: ({ node, children, ...props }) => (
+      <div data-line={node?.position?.start?.line} className="overflow-x-auto mb-3">
         <table className="min-w-full border-collapse border border-[var(--border-main)]" {...props}>
           {children}
         </table>
       </div>
     ),
-    thead: ({ children, ...props }) => (
+    thead: ({ node, children, ...props }) => (
       <thead className="bg-[var(--bg-sidebar)]" {...props}>
         {children}
       </thead>
     ),
-    tbody: ({ children, ...props }) => (
+    tbody: ({ node, children, ...props }) => (
       <tbody className="divide-y divide-[var(--border-main)]" {...props}>
         {children}
       </tbody>
     ),
-    tr: ({ children, ...props }) => (
+    tr: ({ node, children, ...props }) => (
       <tr className="hover:bg-[var(--accent-hover)]" {...props}>
         {children}
       </tr>
     ),
-    th: ({ children, ...props }) => (
+    th: ({ node, children, ...props }) => (
       <th className="border border-[var(--border-main)] px-3 py-1.5 text-left font-medium text-[var(--text-main)]" {...props}>
         {children}
       </th>
     ),
-    td: ({ children, ...props }) => (
+    td: ({ node, children, ...props }) => (
       <td className="border border-[var(--border-main)] px-3 py-1.5 text-[var(--text-main)]" {...props}>
         {children}
       </td>
     ),
-    hr: (props) => (
-      <hr className="my-6 border-[var(--border-main)]" {...props} />
+    hr: ({ node, ...props }) => (
+      <hr data-line={node?.position?.start?.line} className="my-6 border-[var(--border-main)]" {...props} />
     ),
-    img: ({ src, alt, ...props }) => (
+    img: ({ node, src, alt, ...props }) => (
       <img
+        data-line={node?.position?.start?.line}
         src={src}
         alt={alt || ""}
         className="max-w-full h-auto rounded my-4 mx-auto"
@@ -496,22 +551,22 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
         {...props}
       />
     ),
-    strong: ({ children, ...props }) => (
+    strong: ({ node, children, ...props }) => (
       <strong className="font-semibold text-[var(--text-main)]" {...props}>
         {children}
       </strong>
     ),
-    em: ({ children, ...props }) => (
+    em: ({ node, children, ...props }) => (
       <em className="italic" {...props}>
         {children}
       </em>
     ),
-    del: ({ children, ...props }) => (
+    del: ({ node, children, ...props }) => (
       <del className="line-through text-[var(--text-muted)]" {...props}>
         {children}
       </del>
     ),
-    input: ({ type, checked, ...props }) => {
+    input: ({ node, type, checked, ...props }) => {
       if (type === "checkbox") {
         return (
           <input
@@ -525,12 +580,12 @@ export default function MarkdownViewer({ content, onOpenLink }: Props) {
       }
       return <input type={type} {...props} />;
     },
-    details: ({ children, ...props }) => (
+    details: ({ node, children, ...props }) => (
       <details className="mb-3" {...props}>
         {children}
       </details>
     ),
-    summary: ({ children, ...props }) => (
+    summary: ({ node, children, ...props }) => (
       <summary className="cursor-pointer font-medium text-[var(--text-main)] hover:text-[var(--text-muted)]" {...props}>
         {children}
       </summary>

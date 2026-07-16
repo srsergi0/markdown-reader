@@ -1,4 +1,4 @@
-import { Minus, Square, X, PanelLeft, PanelLeftClose, PanelLeftOpen, File, FolderOpen, Eye, PenSquare } from "lucide-react";
+import { Minus, Square, X, PanelLeft, PanelLeftClose, PanelLeftOpen, File, FolderOpen, Eye, PenSquare, Search } from "lucide-react";
 import ExportMenu from "./ExportMenu";
 import type { ExportMode } from "./SettingsModal";
 import ThemeMenu from "./ThemeMenu";
@@ -15,6 +15,9 @@ type Props = {
   electroview: any;
   onMaximizedChange: (maximized: boolean) => void;
   isMaximized: boolean;
+  hasFolder: boolean;
+  searchOpen: boolean;
+  onToggleSearch: () => void;
 };
 
 const btn = "p-2 rounded-md transition-colors active:scale-95";
@@ -32,6 +35,9 @@ export default function TopBar({
   electroview,
   isMaximized,
   onMaximizedChange,
+  hasFolder,
+  searchOpen,
+  onToggleSearch,
 }: Props) {
   const bg = "bg-[var(--bg-header)]";
   const border = "border-b border-[var(--border-main)]";
@@ -88,6 +94,22 @@ export default function TopBar({
           style={{ appRegion: "no-drag" } as any}
         >
           <FolderOpen className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onToggleSearch}
+          disabled={!hasFolder}
+          aria-label={searchOpen ? "Close search" : "Open search (Ctrl+Shift+F)"}
+          title={hasFolder ? "Search in Workspace (Ctrl+Shift+F)" : "Open a folder to enable search"}
+          className={`${btn} ${
+            !hasFolder
+              ? "opacity-40 cursor-not-allowed text-[var(--text-muted)]"
+              : searchOpen
+              ? `${activeBg} ${textColor}`
+              : `${iconHover} ${iconColor}`
+          }`}
+          style={{ appRegion: "no-drag" } as any}
+        >
+          <Search className="w-4 h-4" />
         </button>
         {activeFile && (
           <>

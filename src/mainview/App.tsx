@@ -64,6 +64,8 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsMode, setSettingsMode] = useState<ExportMode>("print");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [hasFolder, setHasFolder] = useState(false);
+  const [scrollTarget, setScrollTarget] = useState<{ path: string; line: number; timestamp: number } | null>(null);
   const electroviewRef = useRef<any>(null);
   const activeTabRef = useRef<string | null>(null);
   const dragCounterRef = useRef(0);
@@ -194,6 +196,7 @@ function App() {
     setSidebarOpen(true);
     watchedFolderRef.current = folderPath;
     lastFolderPath.current = folderPath;
+    setHasFolder(true);
     view.proxy.request.startWatchingFolder({ path: folderPath });
   }, []);
 
@@ -379,7 +382,7 @@ function App() {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "F") {
         e.preventDefault();
-        if (lastFolderPath.current || watchedFolderRef.current) {
+        if (hasFolder) {
           setSearchOpen((p) => !p);
         }
       }
@@ -389,7 +392,7 @@ function App() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [searchOpen]);
+  }, [searchOpen, hasFolder]);
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -481,9 +484,10 @@ function App() {
           };
 
           const tree = await buildTree(entry as FileSystemDirectoryEntry);
-          electroviewRef.current?.proxy.request.stopWatchingFolder({});
+           electroviewRef.current?.proxy.request.stopWatchingFolder({});
           watchedFolderRef.current = null;
           lastFolderPath.current = null;
+          setHasFolder(false);
           setSidebarFiles([{ name: entry.name, isDirectory: true, path: entry.name, children: tree }]);
           setSidebarOpen(true);
         } else {
@@ -531,12 +535,18 @@ function App() {
           electroview={electroviewRef.current}
           isMaximized={isMaximized}
           onMaximizedChange={setIsMaximized}
+          hasFolder={hasFolder}
+          searchOpen={searchOpen}
+          onToggleSearch={useCallback(() => {
+            if (hasFolder) setSearchOpen((p) => !p);
+          }, [hasFolder])}
         />
         <div className="flex-1 flex min-h-0">
           {searchOpen && (            <SearchPanel
               folderPath={lastFolderPath.current || watchedFolderRef.current || ""}
               electroview={electroviewRef.current}
-              onSelectFile={(path) => {
+              onSelectFile={(path, line) => {
+                setScrollTarget({ path, line, timestamp: Date.now() });
                 const existing = tabs.find((t) => t.path === path);
                 if (existing) {
                   setActiveTabId(existing.id);
@@ -545,7 +555,7 @@ function App() {
                 }
                 const view = electroviewRef.current;
                 if (!view) return;
-                view.proxy.request.getFileContent({ path }).then((result) => {
+                view.proxy.request.getFileContent({ path }).then((result: { content: string; filename: string }) => {
                   if (!result) return;
                   const id = `tab-${++tabCounter}`;
                   setTabs((prev) => [...prev, { id, path, filename: result.filename }]);
@@ -592,7 +602,11 @@ function App() {
               {activeFile && isEditing ? (
                 <MarkdownEditor content={activeContent} onSave={handleSave} />
               ) : (
-                <MarkdownViewer content={activeContent} onOpenLink={handleOpenLink} />
+                <MarkdownViewer
+                  content={activeContent}
+                  onOpenLink={handleOpenLink}
+                  scrollToLine={scrollTarget && scrollTarget.path === activeFile?.path ? scrollTarget : null}
+                />
               )}
             </main>
           </div>

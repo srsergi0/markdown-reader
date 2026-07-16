@@ -258,3 +258,20 @@ body {
 .animate-scale-in {
   animation: scale-in 0.15s ease-out;
 }
+
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0px transparent;
+  }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+}
+
