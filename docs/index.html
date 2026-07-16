@@ -69,6 +69,7 @@
       padding: 20px;
       flex-grow: 1;
       background-color: #ffffff;
+      min-width: 0; /* Prevents flex items from overflowing */
     }
 
     h1 {
@@ -102,11 +103,18 @@
     }
 
     /* Classic Table Styling */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #cccccc;
+    }
+
     table.download-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
-      margin-bottom: 15px;
+      min-width: 500px; /* Ensures table headers don't squish too much */
     }
 
     table.download-table th {
@@ -121,6 +129,40 @@
       border: 1px solid #cccccc;
       padding: 6px 8px;
       vertical-align: middle;
+    }
+
+    /* Mobile Responsiveness Rules */
+    @media (max-width: 640px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #406040;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      .logo-container {
+        margin-bottom: 10px;
+      }
+
+      .sidebar-menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .sidebar-menu li {
+        margin-bottom: 0;
+      }
+
+      .content {
+        padding: 15px;
+      }
     }
 
     table.download-table tr:nth-child(even) {
@@ -204,40 +246,42 @@
     <h2 id="download">Download Markdown Reader <span id="latest-version-title"></span></h2>
     <p>Here are the latest binaries available for download:</p>
 
-    <table class="download-table">
-      <thead>
-        <tr>
-          <th>Link</th>
-          <th>Platform</th>
-          <th>Format</th>
-          <th>File Name</th>
-          <th>Size</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr id="row-win">
-          <td><a href="https://github.com/srsergi0/markdown-reader/releases" id="win-link">Download</a></td>
-          <td>Windows <span id="win-rec"></span></td>
-          <td>ZIP archive</td>
-          <td id="win-file">-</td>
-          <td id="win-size">-</td>
-        </tr>
-        <tr id="row-mac">
-          <td><a href="https://github.com/srsergi0/markdown-reader/releases" id="mac-link">Download</a></td>
-          <td>macOS <span id="mac-rec"></span></td>
-          <td>DMG image</td>
-          <td id="mac-file">-</td>
-          <td id="mac-size">-</td>
-        </tr>
-        <tr id="row-linux">
-          <td><a href="https://github.com/srsergi0/markdown-reader/releases" id="linux-link">Download</a></td>
-          <td>Linux <span id="linux-rec"></span></td>
-          <td>Tarball (.tar.gz)</td>
-          <td id="linux-file">-</td>
-          <td id="linux-size">-</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="download-table">
+        <thead>
+          <tr>
+            <th>Link</th>
+            <th>Platform</th>
+            <th>Format</th>
+            <th>File Name</th>
+            <th>Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="row-win">
+            <td><a href="https://github.com/srsergi0/markdown-reader/releases" id="win-link">Download</a></td>
+            <td>Windows <span id="win-rec"></span></td>
+            <td>ZIP archive</td>
+            <td id="win-file">-</td>
+            <td id="win-size">-</td>
+          </tr>
+          <tr id="row-mac">
+            <td><a href="https://github.com/srsergi0/markdown-reader/releases" id="mac-link">Download</a></td>
+            <td>macOS <span id="mac-rec"></span></td>
+            <td>DMG image</td>
+            <td id="mac-file">-</td>
+            <td id="mac-size">-</td>
+          </tr>
+          <tr id="row-linux">
+            <td><a href="https://github.com/srsergi0/markdown-reader/releases" id="linux-link">Download</a></td>
+            <td>Linux <span id="linux-rec"></span></td>
+            <td>Tarball (.tar.gz)</td>
+            <td id="linux-file">-</td>
+            <td id="linux-size">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <h2 id="features">Features</h2>
     <ul>
