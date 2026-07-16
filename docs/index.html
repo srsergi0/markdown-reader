@@ -3,27 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markdown Reader — Retro-Modern Documentation</title>
+  <title>Markdown Reader</title>
   <meta name="description" content="A lightweight native desktop Markdown reader. Simple, lightweight, and fast.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg: #f3f2ec;
-      --fg: #111111;
-      --border: #111111;
-      --card-bg: #ffffff;
-      
-      /* Retro Accent Palette */
-      --green: #22c55e;
-      --yellow: #facc15;
-      --cyan: #22d3ee;
-      --pink: #f43f5e;
+      --bg-start: #1c1c1e;
+      --bg-end: #0c0c0d;
+      --fg: #e4e4e7;
+      --fg-muted: #a1a1aa;
+      --border: #3f3f46;
+      --border-focus: #a1a1aa;
+      --card-bg: #18181b;
+      --header-bg: #27272a;
       
       --font-mono: 'Share Tech Mono', monospace;
-      --font-sans: 'Space Grotesk', sans-serif;
     }
 
     * {
@@ -33,567 +30,298 @@
     }
 
     body {
-      background-color: var(--bg);
+      background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
       color: var(--fg);
-      font-family: var(--font-sans);
-      line-height: 1.5;
-      padding: 20px;
+      font-family: var(--font-mono);
+      line-height: 1.6;
+      padding: 30px 15px;
+      min-height: 100vh;
     }
 
     a {
-      color: var(--fg);
+      color: #ffffff;
       text-decoration: underline;
-      font-weight: 700;
     }
     a:hover {
-      background-color: var(--yellow);
-      text-decoration: none;
+      background-color: var(--header-bg);
+      color: #ffffff;
     }
 
     .container {
-      max-width: 960px;
+      max-width: 680px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 30px;
+      gap: 25px;
     }
 
-    /* Header Banner */
-    header {
-      background-color: var(--cyan);
-      border: 3px solid var(--border);
-      box-shadow: 6px 6px 0px var(--border);
-      padding: 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--fg);
-      font-family: var(--font-mono);
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .logo svg {
-      width: 32px;
-      height: 32px;
-      fill: none;
-      stroke: var(--border);
-      stroke-width: 2.5px;
-    }
-
-    nav {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .nav-btn {
+    /* Main Box Layout */
+    .panel {
       background-color: var(--card-bg);
-      color: var(--fg);
-      border: 2px solid var(--border);
-      padding: 8px 16px;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      text-decoration: none;
-      font-weight: bold;
-      box-shadow: 3px 3px 0px var(--border);
-    }
-
-    .nav-btn:hover {
-      background-color: var(--yellow);
-      box-shadow: 1px 1px 0px var(--border);
-      transform: translate(2px, 2px);
-    }
-
-    /* Main Grid */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 30px;
-    }
-
-    /* Neo-Brutalist Box */
-    .box {
-      background-color: var(--card-bg);
-      border: 3px solid var(--border);
-      box-shadow: 6px 6px 0px var(--border);
+      border: 1px solid var(--border);
       padding: 30px;
     }
 
-    .box-header {
-      background-color: var(--yellow);
-      border-bottom: 3px solid var(--border);
-      margin: -30px -30px 25px -30px;
-      padding: 15px 30px;
-      font-family: var(--font-mono);
-      font-size: 18px;
+    .panel-header {
+      font-size: 14px;
       font-weight: bold;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .box-header.green-header {
-      background-color: var(--green);
-    }
-
-    .box-header.pink-header {
-      background-color: var(--pink);
       color: #ffffff;
     }
 
     h1 {
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: normal;
+      margin-bottom: 5px;
+      color: #ffffff;
       letter-spacing: -0.5px;
     }
 
-    .tagline {
-      font-family: var(--font-mono);
-      font-size: 16px;
-      color: #444;
-      margin-bottom: 20px;
-      display: inline-block;
-      background-color: var(--yellow);
-      padding: 2px 8px;
-      border: 2px solid var(--border);
+    .subtitle {
+      color: var(--fg-muted);
+      margin-bottom: 25px;
+      font-size: 12px;
     }
 
     p {
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-
-    /* Responsive Table wrapper */
-    .table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      border: 3px solid var(--border);
-      box-shadow: 4px 4px 0px var(--border);
-      margin: 20px 0;
-    }
-
-    table.download-table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-      font-family: var(--font-sans);
-      min-width: 600px;
-    }
-
-    table.download-table th {
-      background-color: var(--border);
-      color: #ffffff;
-      padding: 12px;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: bold;
-      text-align: left;
-      border-right: 1px solid #ffffff;
-    }
-
-    table.download-table td {
-      border: 2px solid var(--border);
-      padding: 12px;
       font-size: 15px;
-    }
-
-    table.download-table tr:hover {
-      background-color: #fafafa;
-    }
-
-    .recommended-row {
-      background-color: #fef08a !important;
-    }
-
-    .badge-rec {
-      background-color: var(--pink);
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 2px 6px;
-      border: 1px solid var(--border);
-      margin-left: 8px;
-    }
-
-    .download-link-btn {
-      display: inline-block;
-      background-color: var(--cyan);
+      margin-bottom: 15px;
       color: var(--fg);
-      border: 2px solid var(--border);
-      padding: 6px 12px;
-      font-family: var(--font-mono);
-      font-size: 13px;
+    }
+
+    /* Primary CTA Button */
+    .cta-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin: 25px 0;
+      padding: 20px;
+      background-color: #09090b;
+      border: 1px solid var(--border);
+    }
+
+    .main-download-btn {
+      display: inline-block;
+      border: 2px solid #ffffff;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 12px 28px;
+      font-size: 16px;
       font-weight: bold;
       text-decoration: none;
-      box-shadow: 2px 2px 0px var(--border);
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
     }
 
-    .download-link-btn:hover {
-      background-color: var(--yellow);
-      box-shadow: 0px 0px 0px var(--border);
-      transform: translate(2px, 2px);
+    .main-download-btn:hover {
+      background-color: transparent;
+      color: #ffffff;
+      border-color: #ffffff;
     }
 
-    /* Grid of features */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-top: 15px;
+    .other-platforms {
+      font-size: 12px;
+      color: var(--fg-muted);
     }
 
-    .feature-card {
-      border: 2px solid var(--border);
-      padding: 15px;
-      background-color: #ffffff;
-      box-shadow: 4px 4px 0px var(--border);
-    }
-
-    .feature-card h3 {
-      font-family: var(--font-mono);
-      margin-bottom: 8px;
-      background-color: var(--cyan);
-      display: inline-block;
-      padding: 2px 6px;
-      border: 1.5px solid var(--border);
-    }
-
-    /* Installation steps */
-    .tabs {
+    /* Benefits Layout */
+    .benefits-list {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 3px solid var(--border);
-      padding-bottom: 10px;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 10px;
     }
 
-    .tab-btn {
-      background-color: var(--card-bg);
-      border: 2px solid var(--border);
-      padding: 8px 16px;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 3px 3px 0px var(--border);
+    .benefit-item {
+      border-left: 2px solid var(--border-focus);
+      padding-left: 15px;
     }
 
-    .tab-btn.active {
-      background-color: var(--yellow);
-      box-shadow: 0px 0px 0px var(--border);
-      transform: translate(3px, 3px);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    ol {
-      margin-left: 20px;
-    }
-
-    li {
-      margin-bottom: 12px;
+    .benefit-item h3 {
       font-size: 15px;
+      color: #ffffff;
+      margin-bottom: 5px;
     }
 
-    code {
-      font-family: var(--font-mono);
-      background-color: #e5e7eb;
-      padding: 2px 5px;
-      border: 1px solid var(--border);
+    .benefit-item p {
+      font-size: 13px;
+      color: var(--fg-muted);
+      margin-bottom: 0;
+    }
+
+    /* Minimal list */
+    ul.platform-links {
+      list-style-type: none;
+      padding: 0;
+      margin: 15px 0 0 0;
+      display: flex;
+      gap: 15px;
+      font-size: 13px;
+    }
+
+    ul.platform-links li::before {
+      content: "[ ";
+    }
+    ul.platform-links li::after {
+      content: " ]";
     }
 
     pre {
-      background-color: #1e1e1e;
-      color: #4ade80;
-      border: 3px solid var(--border);
-      padding: 15px;
-      font-family: var(--font-mono);
-      font-size: 14px;
+      background-color: #09090b;
+      border: 1px solid var(--border);
+      padding: 12px;
+      font-size: 13px;
       overflow-x: auto;
-      margin-top: 8px;
-      box-shadow: 4px 4px 0px var(--border);
-    }
-
-    /* Footer */
-    footer {
-      border: 3px solid var(--border);
-      background-color: var(--border);
+      margin: 10px 0;
       color: #ffffff;
-      padding: 20px;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
     }
 
-    /* Responsive */
-    @media (max-width: 640px) {
-      body {
-        padding: 10px;
-      }
-
-      header {
-        padding: 15px;
-      }
-
-      h1 {
-        font-size: 26px;
-      }
-
-      .box {
-        padding: 20px;
-      }
-
-      .box-header {
-        margin: -20px -20px 20px -20px;
-        padding: 10px 20px;
-      }
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--fg-muted);
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Header -->
-  <header>
-    <a href="#" class="logo">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-      </svg>
-      MD_READER
-    </a>
-    <nav>
-      <a href="#download-box" class="nav-btn">Downloads</a>
-      <a href="#install-box" class="nav-btn">Install</a>
-      <a href="https://github.com/srsergi0/markdown-reader" class="nav-btn" target="_blank" rel="noopener">GitHub</a>
-    </nav>
-  </header>
-
-  <!-- Hero Details -->
-  <div class="box">
-    <h1>Markdown Reader</h1>
-    <span class="tagline">v1.0.0 — Native & Ultra-Fast</span>
-    <p>Markdown Reader is a minimalist desktop viewer crafted for high speed. Built with Electrobun, it offers a tiny footprint (~14MB) and starts in under 50ms by leveraging the platform's native WebView.</p>
+  <!-- Hero / Pitch Panel -->
+  <div class="panel">
+    <h1>MARKDOWN_READER</h1>
+    <div class="subtitle">LOCAL // INSTANT // PRIVACY_FIRST</div>
     
-    <div class="features-grid">
-      <div class="feature-card">
-        <h3>[01] Native</h3>
-        <p>Uses native OS views for rendering instead of heavy Chromium containers.</p>
-      </div>
-      <div class="feature-card">
-        <h3>[02] Fast</h3>
-        <p>Opens files instantly. Lightweight enough to run in the background with zero lag.</p>
-      </div>
-      <div class="feature-card">
-        <h3>[03] Sync</h3>
-        <p>Reflects file updates instantly when saved from external editors.</p>
+    <p>In the era of AI, we generate summaries, documentations, and code reports faster than we can read them. Markdown Reader is a dedicated local viewer built to let you open, scan, and read markdown files immediately without waiting for heavy editors to launch.</p>
+    
+    <!-- Primary CTA (Automatic OS Download) -->
+    <div class="cta-container">
+      <a href="https://github.com/srsergi0/markdown-reader/releases" class="main-download-btn" id="cta-btn">
+        DOWNLOAD_RELEASE
+      </a>
+      <div class="other-platforms">
+        Alternative packages: 
+        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-win">Windows (.zip)</a> // 
+        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-mac">macOS (.dmg)</a> // 
+        <a href="https://github.com/srsergi0/markdown-reader/releases" id="alt-linux">Linux (.tar.gz)</a>
       </div>
     </div>
   </div>
 
-  <!-- Downloads -->
-  <div class="box" id="download-box">
-    <div class="box-header green-header">
-      <span>AVAILABLE_RELEASES</span>
-      <span id="release-version-badge">LATEST</span>
+  <!-- Benefits Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <span>WHY_MARKDOWN_READER</span>
+      <span>BENEFITS</span>
     </div>
-    
-    <p>Select the download link for your operating system. Recommended platform is highlighted in yellow:</p>
 
-    <div class="table-wrapper">
-      <table class="download-table">
-        <thead>
-          <tr>
-            <th>FILE_LINK</th>
-            <th>TARGET_OS</th>
-            <th>EXTENSION</th>
-            <th>FILE_NAME</th>
-            <th>FILE_SIZE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="row-win">
-            <td><a href="https://github.com/srsergi0/markdown-reader/releases" class="download-link-btn" id="win-link">DOWNLOAD</a></td>
-            <td>Windows <span id="win-rec"></span></td>
-            <td>.ZIP</td>
-            <td id="win-file">-</td>
-            <td id="win-size">-</td>
-          </tr>
-          <tr id="row-mac">
-            <td><a href="https://github.com/srsergi0/markdown-reader/releases" class="download-link-btn" id="mac-link">DOWNLOAD</a></td>
-            <td>macOS <span id="mac-rec"></span></td>
-            <td>.DMG</td>
-            <td id="mac-file">-</td>
-            <td id="mac-size">-</td>
-          </tr>
-          <tr id="row-linux">
-            <td><a href="https://github.com/srsergi0/markdown-reader/releases" class="download-link-btn" id="linux-link">DOWNLOAD</a></td>
-            <td>Linux <span id="linux-rec"></span></td>
-            <td>.TAR.GZ</td>
-            <td id="linux-file">-</td>
-            <td id="linux-size">-</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="benefits-list">
+      <div class="benefit-item">
+        <h3>[01] Focused Reading</h3>
+        <p>No editor toolbars, no markdown markdown-markup distractions. Just your rendered formatting, clean developer fonts, and smooth navigation.</p>
+      </div>
+      <div class="benefit-item">
+        <h3>[02] Zero Launch Delay</h3>
+        <p>Double-click any .md file and read it instantly. Launches in milliseconds by utilizing your operating system's native render viewports.</p>
+      </div>
+      <div class="benefit-item">
+        <h3>[03] Privacy & Security</h3>
+        <p>100% offline. Read sensitive locally generated LLM summaries, code reviews, and databases securely without sending files to third-party web apps.</p>
+      </div>
+      <div class="benefit-item">
+        <h3>[04] Developer Ready</h3>
+        <p>Built-in automatic formatting for standard markdown, syntax highlighting, and live rendering for Mermaid flowchart diagrams.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Installation Steps -->
-  <div class="box" id="install-box">
-    <div class="box-header pink-header">
-      <span>INSTALLATION_STEPS</span>
-      <span>SETUP</span>
+  <!-- Quick Setup Info -->
+  <div class="panel" id="setup">
+    <div class="panel-header">
+      <span>SETUP_INSTRUCTIONS</span>
+      <span>GETTING_STARTED</span>
     </div>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('win')">Windows</button>
-      <button class="tab-btn" onclick="switchTab('mac')">macOS</button>
-      <button class="tab-btn" onclick="switchTab('linux')">Linux</button>
-    </div>
-
-    <!-- Windows Instructions -->
-    <div class="tab-content active" id="inst-win">
-      <ol>
-        <li>Download the latest Windows ZIP release.</li>
-        <li>Decompress the ZIP folder to your preferred installation directory.</li>
-        <li>To register <code>.md</code> file associations so double-clicking opens them automatically, run:
-          <pre>bun run register</pre>
-        </li>
-      </ol>
-    </div>
-
-    <!-- macOS Instructions -->
-    <div class="tab-content" id="inst-mac">
-      <ol>
-        <li>Download the <code>.dmg</code> disk image file.</li>
-        <li>Open the DMG container and drag the <strong>Markdown Reader</strong> app icon into your <strong>Applications</strong> directory.</li>
-        <li>Launch the app. macOS might request standard gatekeeper authorization on initial execution.</li>
-      </ol>
-    </div>
-
-    <!-- Linux Instructions -->
-    <div class="tab-content" id="inst-linux">
-      <ol>
-        <li>Download the <code>.tar.gz</code> archive.</li>
-        <li>Extract the file archive in your command line terminal:
-          <pre>tar -xzf MarkdownReader-Linux-x64.tar.gz&#10;cd MarkdownReader-Linux-x64&#10;./markdown-reader</pre>
-        </li>
-      </ol>
-    </div>
+    
+    <p>For Windows, extract the archive and run: <code>bun run register</code> to enable double-click file associations. On macOS, copy the application to your Applications folder.</p>
   </div>
 
   <!-- Footer -->
   <footer>
-    [MD_READER] &copy; 2026. Made with Electrobun. Standard MIT License.
+    [MARKDOWN_READER] &copy; 2026 // MIT LICENSE // <a href="https://github.com/srsergi0/markdown-reader" style="color: var(--fg-muted);">source_code</a>
   </footer>
 </div>
 
 <script>
-  function switchTab(platform) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-    const btn = (typeof event !== 'undefined' && event && event.target) ? event.target : [...document.querySelectorAll('.tab-btn')].find(b => b.innerText.toLowerCase().includes(platform));
-    if (btn) btn.classList.add('active');
-    document.getElementById('inst-' + platform).classList.add('active');
-  }
-
-  function formatBytes(bytes) {
-    if (!bytes || bytes === 0) return '-';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
   function detectOS() {
     const userAgent = window.navigator.userAgent.toLowerCase();
     let os = 'win';
+    let label = 'DOWNLOAD FOR WINDOWS';
+    
     if (userAgent.indexOf('mac') !== -1) {
       os = 'mac';
+      label = 'DOWNLOAD FOR MACOS';
     } else if (userAgent.indexOf('linux') !== -1) {
       os = 'linux';
+      label = 'DOWNLOAD FOR LINUX';
     }
     
-    const row = document.getElementById('row-' + os);
-    if (row) {
-      row.className = 'recommended-row';
-    }
-    
-    const recBadge = document.getElementById(os + '-rec');
-    if (recBadge) {
-      recBadge.innerHTML = '<span class="badge-rec">RECOMMENDED</span>';
-    }
-
-    switchTab(os);
+    return { os, label };
   }
 
   async function loadRelease() {
     const repo = 'srsergi0/markdown-reader';
     const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
+    const fallbackUrl = `https://github.com/${repo}/releases/latest`;
+    
+    const { os, label } = detectOS();
+    const btn = document.getElementById('cta-btn');
+    btn.innerText = label;
 
     try {
       const response = await fetch(apiUrl);
       if (!response.ok) throw new Error('API Request Failed');
       const data = await response.json();
-      
-      const version = data.tag_name;
-      document.getElementById('release-version-badge').innerText = version;
-      document.querySelectorAll('.tagline').forEach(el => el.innerText = `${version} — Native & Ultra-Fast`);
 
-      let winAsset = null;
-      let macAsset = null;
-      let linuxAsset = null;
+      let winUrl = fallbackUrl;
+      let macUrl = fallbackUrl;
+      let linuxUrl = fallbackUrl;
 
       data.assets.forEach(asset => {
         const name = asset.name.toLowerCase();
         if (name.endsWith('.zip') || name.endsWith('.exe')) {
-          winAsset = asset;
+          winUrl = asset.browser_download_url;
         } else if (name.endsWith('.dmg')) {
-          macAsset = asset;
+          macUrl = asset.browser_download_url;
         } else if (name.endsWith('.tar.gz')) {
-          linuxAsset = asset;
+          linuxUrl = asset.browser_download_url;
         }
       });
 
-      if (winAsset) {
-        document.getElementById('win-link').href = winAsset.browser_download_url;
-        document.getElementById('win-file').innerText = winAsset.name;
-        document.getElementById('win-size').innerText = formatBytes(winAsset.size);
-      }
-      if (macAsset) {
-        document.getElementById('mac-link').href = macAsset.browser_download_url;
-        document.getElementById('mac-file').innerText = macAsset.name;
-        document.getElementById('mac-size').innerText = formatBytes(macAsset.size);
-      }
-      if (linuxAsset) {
-        document.getElementById('linux-link').href = linuxAsset.browser_download_url;
-        document.getElementById('linux-file').innerText = linuxAsset.name;
-        document.getElementById('linux-size').innerText = formatBytes(linuxAsset.size);
+      // Update alternative links
+      document.getElementById('alt-win').href = winUrl;
+      document.getElementById('alt-mac').href = macUrl;
+      document.getElementById('alt-linux').href = linuxUrl;
+
+      // Update main button link based on OS
+      if (os === 'win') {
+        btn.href = winUrl;
+      } else if (os === 'mac') {
+        btn.href = macUrl;
+      } else if (os === 'linux') {
+        btn.href = linuxUrl;
       }
 
     } catch (e) {
       console.log('Error loading release details', e);
+      btn.href = fallbackUrl;
     }
-    
-    detectOS();
   }
 
   window.addEventListener('DOMContentLoaded', loadRelease);
