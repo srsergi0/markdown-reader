@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, createContext, useContext, useMemo } from "react";
 import type { FileEntry } from "../shared/types";
-import { desktop } from "./desktop";
+import { desktop, type UpdateStatus } from "./desktop";
 import { buildPrintHTML, buildStandaloneHTML } from "../shared/buildPrintHTML";
 import MarkdownViewer from "./components/MarkdownViewer";
 import MarkdownEditor from "./components/MarkdownEditor";
@@ -13,8 +13,6 @@ import Toast from "./components/Toast";
 import UpdateToast from "./components/UpdateToast";
 import { printMarkdown, type PrintOptions } from "./utils/print";
 import { Upload } from "lucide-react";
-
-declare const __APP_VERSION__: string;
 
 export type ThemeId =
   | "github-light"
@@ -50,6 +48,12 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+// Matches Tailwind's `md` breakpoint (768px). Below it, the sidebar and the
+// search panel behave as overlay drawers instead of taking layout space.
+const isNarrowViewport = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(max-width: 767px)").matches;
+
 const savedSession = (() => {
   try {
     const saved = localStorage.getItem("md-reader-session");
@@ -84,7 +88,8 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsMode, setSettingsMode] = useState<ExportMode>("print");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [updateInfo, setUpdateInfo] = useState<{ version: string; url: string } | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
   const [hasFolder, setHasFolder] = useState<boolean>(() => !!savedSession?.folderPath);
   const [workspacePath, setWorkspacePath] = useState<string | null>(() => savedSession?.folderPath || null);
   const [scrollTarget, setScrollTarget] = useState<{ path: string; line: number; timestamp: number } | null>(null);
@@ -188,6 +193,13 @@ function App() {
     const unsubscribeFolderChanged = desktop.on("folderChanged", ({ files }) => {
       setSidebarFiles(files);
     });
+    const unsubscribeUpdateStatus = desktop.on(
+      "update:status",
+      (status: UpdateStatus) => {
+        setUpdateStatus(status);
+        if (status.state === "available") setUpdateDismissed(false);
+      },
+    );
 
     // Load content for restored tabs and set up watchers
     const initRestoredSession = async () => {
@@ -244,62 +256,32 @@ function App() {
       }
     };
 
-    const isNewerVersion = (current: string, latest: string): boolean => {
-      const parse = (v: string) => v.split(".").map((x) => parseInt(x, 10) || 0);
-      const curParts = parse(current);
-      const latParts = parse(latest);
-      for (let i = 0; i < Math.max(curParts.length, latParts.length); i++) {
-        const cur = curParts[i] || 0;
-        const lat = latParts[i] || 0;
-        if (lat > cur) return true;
-        if (cur > lat) return false;
-      }
-      return false;
-    };
-
-    const checkForUpdates = async () => {
-      try {
-        const response = await fetch("https://api.github.com/repos/srsergi0/markdown-reader/releases/latest");
-        if (!response.ok) return;
-        const data = await response.json();
-        const latestVersion = data.tag_name;
-        if (!latestVersion) return;
-
-        const cleanLatest = latestVersion.replace(/^v/, "");
-        const cleanCurrent = __APP_VERSION__.replace(/^v/, "");
-
-        console.log("Update check:", { cleanCurrent, cleanLatest });
-
-        if (isNewerVersion(cleanCurrent, cleanLatest)) {
-          setUpdateInfo({
-            version: cleanLatest,
-            url: data.html_url || "https://github.com/srsergi0/markdown-reader/releases/latest"
-          });
-        }
-      } catch (e) {
-        console.error("Failed to check for updates:", e);
-      }
-    };
-
     initRestoredSession();
-    checkForUpdates();
+    desktop.proxy.request.checkForUpdates().catch((e) => {
+      console.error("Failed to check for updates:", e);
+    });
 
     return () => {
       unsubscribeInitialFile();
       unsubscribeFileChanged();
       unsubscribeFolderChanged();
+      unsubscribeUpdateStatus();
       desktop.proxy.request.stopWatchingFolder({}).catch(() => {});
       desktop.proxy.request.stopWatching({}).catch(() => {});
     };
   }, []);
 
   const handleDownloadUpdate = useCallback(() => {
-    if (updateInfo && electroviewRef.current) {
-      electroviewRef.current.proxy.request.openExternalUrl({ url: updateInfo.url }).catch((err: any) => {
-        console.error("Failed to open update url:", err);
-      });
-    }
-  }, [updateInfo]);
+    desktop.proxy.request.downloadUpdate().catch((err) => {
+      console.error("Failed to download update:", err);
+    });
+  }, []);
+
+  const handleInstallUpdate = useCallback(() => {
+    desktop.proxy.request.installUpdate().catch((err) => {
+      console.error("Failed to install update:", err);
+    });
+  }, []);
 
   const activeContent = activeTabId ? tabContents[activeTabId] || "" : "";
   const activeFile = tabs.find((t) => t.id === activeTabId) || null;
@@ -337,6 +319,7 @@ function App() {
 
   const handleSelectSidebarFile = useCallback(
     async (entry: FileEntry) => {
+      if (isNarrowViewport()) setSidebarOpen(false);
       const view = electroviewRef.current;
       if (!view) return;
       const existing = tabs.find((t) => t.path === entry.path);
@@ -658,11 +641,14 @@ function App() {
           onToggleSidebar={() => {
             const next = !sidebarOpen;
             setSidebarOpen(next);
-            if (next && lastFolderPath.current && !watchedFolderRef.current) {
-              const view = electroviewRef.current;
-              if (view) {
-                watchedFolderRef.current = lastFolderPath.current;
-                view.proxy.request.startWatchingFolder({ path: lastFolderPath.current }).catch(() => {});
+            if (next) {
+              if (isNarrowViewport()) setSearchOpen(false);
+              if (lastFolderPath.current && !watchedFolderRef.current) {
+                const view = electroviewRef.current;
+                if (view) {
+                  watchedFolderRef.current = lastFolderPath.current;
+                  view.proxy.request.startWatchingFolder({ path: lastFolderPath.current }).catch(() => {});
+                }
               }
             }
           }}
@@ -670,15 +656,29 @@ function App() {
           hasFolder={hasFolder}
           searchOpen={searchOpen}
           onToggleSearch={useCallback(() => {
-            if (hasFolder) setSearchOpen((p) => !p);
+            if (hasFolder) {
+              setSearchOpen((p) => {
+                const next = !p;
+                if (next && isNarrowViewport()) setSidebarOpen(false);
+                return next;
+              });
+            }
           }, [hasFolder])}
         />
-        <div className="flex-1 flex min-h-0">
+        <div className="flex-1 flex min-h-0 relative">
+          {sidebarOpen && (
+            <div
+              className="absolute inset-0 z-30 bg-black/40 md:hidden"
+              onClick={() => setSidebarOpen(false)}
+              aria-hidden="true"
+            />
+          )}
           {searchOpen && (            <SearchPanel
               folderPath={lastFolderPath.current || watchedFolderRef.current || ""}
               electroview={electroviewRef.current}
               onSelectFile={(path, line) => {
                 setScrollTarget({ path, line, timestamp: Date.now() });
+                if (isNarrowViewport()) setSearchOpen(false);
                 const existing = tabs.find((t) => t.path === path);
                 if (existing) {
                   setActiveTabId(existing.id);
@@ -757,13 +757,18 @@ function App() {
         visible={toastMsg !== null}
         onDone={() => setToastMsg(null)}
       />
-      {updateInfo && (
-        <UpdateToast
-          latestVersion={updateInfo.version}
-          onDownload={handleDownloadUpdate}
-          onClose={() => setUpdateInfo(null)}
-        />
-      )}
+      {updateStatus &&
+        !updateDismissed &&
+        (updateStatus.state === "available" ||
+          updateStatus.state === "downloading" ||
+          updateStatus.state === "downloaded") && (
+          <UpdateToast
+            status={updateStatus}
+            onDownload={handleDownloadUpdate}
+            onInstall={handleInstallUpdate}
+            onClose={() => setUpdateDismissed(true)}
+          />
+        )}
     </ThemeContext.Provider>
   );
 }

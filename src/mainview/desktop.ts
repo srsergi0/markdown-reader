@@ -25,6 +25,25 @@ export type SearchResult = {
 	content: string;
 };
 
+export type UpdateStatus =
+	| { state: "checking" }
+	| {
+			state: "available";
+			version: string;
+			releaseNotes: string | null;
+			releaseDate: string | null;
+	  }
+	| { state: "not-available"; version: string | null }
+	| {
+			state: "downloading";
+			percent: number;
+			transferred: number;
+			total: number;
+			bytesPerSecond: number;
+	  }
+	| { state: "downloaded"; version: string }
+	| { state: "error"; message: string };
+
 export const desktop = {
 	proxy: {
 		request: {
@@ -83,10 +102,18 @@ export const desktop = {
 				url: string;
 			}): Promise<{ success: boolean }> =>
 				bridge.invoke("openExternalUrl", params),
+			checkForUpdates: (): Promise<{
+				supported: boolean;
+				version?: string | null;
+			}> => bridge.invoke("update:check"),
+			downloadUpdate: (): Promise<{ supported: boolean }> =>
+				bridge.invoke("update:download"),
+			installUpdate: (): Promise<{ supported: boolean }> =>
+				bridge.invoke("update:install"),
 		},
 	},
 	on: (
-		channel: "initialFile" | "fileChanged" | "folderChanged",
+		channel: "initialFile" | "fileChanged" | "folderChanged" | "update:status",
 		listener: (payload: any) => void,
 	) => bridge.on(channel, listener),
 };

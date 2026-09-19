@@ -79,7 +79,7 @@ export default function SearchPanel({ folderPath, electroview, onSelectFile, onC
   const groupedKeys = Object.keys(grouped);
 
   return (
-    <div className="w-72 flex-shrink-0 h-full bg-[var(--bg-sidebar)] border-r border-[var(--border-main)] flex flex-col select-none">
+    <div className="w-72 max-w-[85vw] flex-shrink-0 h-full bg-[var(--bg-sidebar)] border-r border-[var(--border-main)] flex flex-col select-none absolute inset-y-0 left-0 z-40 shadow-2xl md:relative md:z-auto md:shadow-none">
       <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-main)]">
         <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Search in Workspace</span>
         <button onClick={onClose} aria-label="Close search" className="p-1 rounded hover:bg-[var(--accent-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors focus-visible:outline-2 focus-visible:outline-blue-500">

@@ -382,6 +382,105 @@ function registerIpcHandlers() {
 			return { success: false };
 		}
 	});
+
+	ipcMain.handle("update:check", async () => {
+		if (!autoUpdater) return { supported: false };
+		try {
+			const result = await autoUpdater.checkForUpdates();
+			return { supported: true, version: result?.updateInfo?.version || null };
+		} catch (err) {
+			console.error("Update check failed:", err);
+			sendToRenderer("update:status", {
+				state: "error",
+				message: err?.message || String(err),
+			});
+			return { supported: true };
+		}
+	});
+
+	ipcMain.handle("update:download", async () => {
+		if (!autoUpdater) return { supported: false };
+		try {
+			await autoUpdater.downloadUpdate();
+			return { supported: true };
+		} catch (err) {
+			console.error("Update download failed:", err);
+			sendToRenderer("update:status", {
+				state: "error",
+				message: err?.message || String(err),
+			});
+			return { supported: true };
+		}
+	});
+
+	ipcMain.handle("update:install", async () => {
+		if (!autoUpdater) return { supported: false };
+		setImmediate(() => {
+			try {
+				autoUpdater.quitAndInstall();
+			} catch (err) {
+				console.error("Update install failed:", err);
+			}
+		});
+		return { supported: true };
+	});
+}
+
+let autoUpdater = null;
+
+function initAutoUpdater() {
+	if (!app.isPackaged) {
+		console.log("Auto-update disabled in development.");
+		return;
+	}
+	try {
+		({ autoUpdater } = require("electron-updater"));
+	} catch (err) {
+		console.error("electron-updater is not available:", err);
+		return;
+	}
+
+	autoUpdater.autoDownload = false;
+	autoUpdater.autoInstallOnAppQuit = true;
+
+	autoUpdater.on("checking-for-update", () => {
+		sendToRenderer("update:status", { state: "checking" });
+	});
+	autoUpdater.on("update-available", (info) => {
+		sendToRenderer("update:status", {
+			state: "available",
+			version: info.version,
+			releaseNotes: typeof info.releaseNotes === "string" ? info.releaseNotes : null,
+			releaseDate: info.releaseDate || null,
+		});
+	});
+	autoUpdater.on("update-not-available", (info) => {
+		sendToRenderer("update:status", {
+			state: "not-available",
+			version: info?.version || null,
+		});
+	});
+	autoUpdater.on("download-progress", (progress) => {
+		sendToRenderer("update:status", {
+			state: "downloading",
+			percent: progress.percent,
+			transferred: progress.transferred,
+			total: progress.total,
+			bytesPerSecond: progress.bytesPerSecond,
+		});
+	});
+	autoUpdater.on("update-downloaded", (info) => {
+		sendToRenderer("update:status", {
+			state: "downloaded",
+			version: info.version,
+		});
+	});
+	autoUpdater.on("error", (err) => {
+		sendToRenderer("update:status", {
+			state: "error",
+			message: err?.message || String(err),
+		});
+	});
 }
 
 async function loadMainView() {
@@ -404,8 +503,8 @@ function createWindow() {
 	mainWindow = new BrowserWindow({
 		width: 1000,
 		height: 750,
-		minWidth: 640,
-		minHeight: 480,
+		minWidth: 380,
+		minHeight: 360,
 		title: "Markdown Reader",
 		backgroundColor: "#1e1e1e",
 		show: false,
@@ -477,6 +576,7 @@ if (!gotSingleInstanceLock) {
 			Menu.setApplicationMenu(null);
 		}
 		registerIpcHandlers();
+		initAutoUpdater();
 		createWindow();
 
 		app.on("activate", () => {

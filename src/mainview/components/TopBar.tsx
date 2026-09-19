@@ -106,7 +106,7 @@ export default function TopBar({
           </>
         )}
       </div>
-      <div className="flex items-center h-full pr-1">
+      <div className="flex items-center h-full pr-1 flex-shrink-0">
         <ExportMenu onSelect={onExportSelect} disabled={!activeFile} />
         <div className="w-px h-4 bg-[var(--border-main)] mx-1" aria-hidden="true" />
         <ThemeMenu />

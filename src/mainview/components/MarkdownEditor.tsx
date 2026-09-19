@@ -8,8 +8,8 @@ import "@blocknote/core/fonts/inter.css";
 
 const editorStyles = `
   .md-editor .bn-editor {
-    padding-inline: 54px;
-    padding-block: 32px;
+    padding-inline: clamp(16px, 5vw, 54px);
+    padding-block: clamp(20px, 4vw, 32px);
   }
   .md-editor .bn-block-content[data-content-type="heading"][data-level="1"] {
     font-size: 1.875rem !important;

@@ -21,6 +21,19 @@ This is an Electron desktop application.
 - Only channels listed in `electron/preload.js` are allowed.
 - Context isolation is enabled; Node integration is disabled in the renderer.
 
+## Auto-update
+
+- Uses `electron-updater` with the GitHub provider configured in the
+  `build.publish` field of `package.json`.
+- Disabled in development (`app.isPackaged === false`).
+- IPC: `update:check`, `update:download`, `update:install` (requests) and
+  `update:status` (event with `state: checking | available | not-available |
+  downloading | downloaded | error`).
+- electron-builder writes `app-update.yml` into the app resources and generates
+  `latest*.yml` metadata; the release workflow must upload those `.yml` files
+  (and `.blockmap`) next to the installers.
+- macOS auto-update requires a signed/notarized build.
+
 ## Scripts
 
 - `bun run dev` - Vite dev server + Electron with HMR.
@@ -31,3 +44,4 @@ This is an Electron desktop application.
 
 Electron API reference: https://www.electronjs.org/docs/latest/
 electron-builder: https://www.electron.build/
+electron-updater: https://www.electron.build/auto-update

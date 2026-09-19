@@ -125,7 +125,7 @@ function BreadcrumbSegment({
     >
       <button
         onClick={() => onSelect(item.id)}
-        className={`px-2 py-0.5 rounded transition-all text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-hover)] font-medium truncate max-w-[140px] text-xs ${
+        className={`px-2 py-0.5 rounded transition-all text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-hover)] font-medium truncate max-w-[90px] sm:max-w-[140px] text-xs ${
           open ? "text-[var(--accent-blue)] bg-[var(--accent-hover)]" : ""
         }`}
       >
@@ -135,7 +135,7 @@ function BreadcrumbSegment({
       {/* Segment Sibling Dropdown Menu */}
       {open && siblings.length > 1 && (
         <div 
-          className="absolute left-0 mt-1 min-w-[200px] max-w-[280px] bg-[var(--bg-sidebar)]/90 backdrop-blur-xl border border-[var(--border-main)] rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] p-1 z-50 animate-scale-in max-h-60 overflow-y-auto custom-scrollbar select-none flex flex-col gap-0.5"
+          className="absolute left-0 mt-1 min-w-[180px] max-w-[80vw] sm:max-w-[280px] bg-[var(--bg-sidebar)]/90 backdrop-blur-xl border border-[var(--border-main)] rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] p-1 z-50 animate-scale-in max-h-60 overflow-y-auto custom-scrollbar select-none flex flex-col gap-0.5"
           style={{ top: "100%" }}
         >
           {siblings.map((sibling) => {
@@ -353,7 +353,7 @@ export default function MarkdownViewer({ content, onOpenLink, scrollToLine }: Pr
         <h1
           id={id}
           data-line={node?.position?.start?.line}
-          className="text-3xl font-bold mt-8 mb-4 text-[var(--text-main)] pb-2 border-b border-[var(--border-main)] scroll-mt-20"
+          className="text-2xl sm:text-3xl font-bold mt-8 mb-4 text-[var(--text-main)] pb-2 border-b border-[var(--border-main)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -367,7 +367,7 @@ export default function MarkdownViewer({ content, onOpenLink, scrollToLine }: Pr
         <h2
           id={id}
           data-line={node?.position?.start?.line}
-          className="text-2xl font-bold mt-6 mb-3 text-[var(--text-main)] pb-1 scroll-mt-20"
+          className="text-xl sm:text-2xl font-bold mt-6 mb-3 text-[var(--text-main)] pb-1 scroll-mt-20"
           {...props}
         >
           {children}
@@ -381,7 +381,7 @@ export default function MarkdownViewer({ content, onOpenLink, scrollToLine }: Pr
         <h3
           id={id}
           data-line={node?.position?.start?.line}
-          className="text-xl font-semibold mt-5 mb-2 text-[var(--text-main)] scroll-mt-20"
+          className="text-lg sm:text-xl font-semibold mt-5 mb-2 text-[var(--text-main)] scroll-mt-20"
           {...props}
         >
           {children}
@@ -608,7 +608,7 @@ export default function MarkdownViewer({ content, onOpenLink, scrollToLine }: Pr
     <div className="h-full w-full overflow-hidden relative bg-[var(--bg-editor)] text-[var(--text-main)]">
       {/* Floating Glass Breadcrumbs Bar */}
       {activePath.length > 0 && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-[var(--bg-sidebar)]/85 backdrop-blur-md border border-[var(--border-main)] rounded-full px-4 py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.45)] select-none">
+        <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-30 flex flex-wrap justify-center items-center gap-1 sm:gap-1.5 max-w-[calc(100%_-_1.5rem)] bg-[var(--bg-sidebar)]/85 backdrop-blur-md border border-[var(--border-main)] rounded-2xl px-2.5 sm:px-4 py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.45)] select-none">
           {activePath.map((item, index) => (
             <div key={item.id} className="flex items-center gap-1.5">
               {index > 0 && (
@@ -627,10 +627,10 @@ export default function MarkdownViewer({ content, onOpenLink, scrollToLine }: Pr
       {/* Main content scroll area */}
       <div 
         ref={scrollContainerRef}
-        className="h-full overflow-y-auto px-8 py-8 relative custom-scrollbar scroll-smooth" 
+        className="h-full overflow-y-auto overflow-x-hidden px-4 py-6 sm:px-6 md:px-8 md:py-8 relative custom-scrollbar scroll-smooth" 
         id="markdown-content-scroll"
       >
-        <div className="max-w-3xl mx-auto pt-14">
+        <div className="max-w-3xl mx-auto pt-12 sm:pt-14">
           <Markdown remarkPlugins={[remarkGfm]} components={components}>
             {content}
           </Markdown>

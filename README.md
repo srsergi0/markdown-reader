@@ -69,6 +69,7 @@ bun install && bun run dev
 *   **Mermaid & MathJax:** Renders flowchart schemas and math formulas out of the box.
 *   **Tabbed Interface:** Manage multiple files and browsable folders efficiently.
 *   **Clean Print Styles:** Export documents to PDF with custom margins and printing layouts.
+*   **Auto-Update:** Built-in updater (electron-updater) that checks GitHub Releases, downloads in the background and installs on restart.
 
 ---
 

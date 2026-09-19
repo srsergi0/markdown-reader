@@ -1,6 +1,6 @@
 {
 	"name": "markdown-reader",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Native Markdown reader with file association support",
 	"author": "srsergi0",
 	"main": "electron/main.js",
@@ -16,25 +16,14 @@
 		"register": "powershell -ExecutionPolicy Bypass -File scripts/register-dev.ps1"
 	},
 	"dependencies": {
+		"electron-updater": "^6.8.9"
+	},
+	"devDependencies": {
 		"@blocknote/core": "^0.51.4",
 		"@blocknote/mantine": "^0.51.4",
 		"@blocknote/react": "^0.51.4",
 		"@mantine/core": "^8.3.11",
 		"@mantine/hooks": "^8.3.11",
-		"gray-matter": "^4.0.3",
-		"lucide-react": "^1.18.0",
-		"mermaid": "^11.15.0",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
-		"react-markdown": "^10.1.0",
-		"react-syntax-highlighter": "^16.1.1",
-		"rehype-stringify": "^10.0.1",
-		"remark-gfm": "^4.0.1",
-		"remark-parse": "^11.0.0",
-		"remark-rehype": "^11.1.2",
-		"unified": "^11.0.5"
-	},
-	"devDependencies": {
 		"@types/bun": "latest",
 		"@types/react": "^18.3.12",
 		"@types/react-dom": "^18.3.1",
@@ -44,24 +33,43 @@
 		"concurrently": "^9.1.0",
 		"electron": "^44.2.0",
 		"electron-builder": "^26.15.3",
+		"gray-matter": "^4.0.3",
+		"lucide-react": "^1.18.0",
+		"mermaid": "^11.15.0",
 		"postcss": "^8.4.49",
 		"puppeteer-core": "^25.1.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-markdown": "^10.1.0",
+		"react-syntax-highlighter": "^16.1.1",
+		"rehype-stringify": "^10.0.1",
+		"remark-gfm": "^4.0.1",
+		"remark-parse": "^11.0.0",
+		"remark-rehype": "^11.1.2",
 		"tailwindcss": "^3.4.16",
 		"typescript": "^5.7.2",
+		"unified": "^11.0.5",
 		"vite": "^6.0.3",
 		"yallist": "^3.1.1"
 	},
 	"build": {
 		"appId": "com.srsergi0.markdownreader",
 		"productName": "Markdown Reader",
+		"artifactName": "${name}-${version}-${arch}.${ext}",
 		"directories": {
 			"output": "artifacts"
 		},
 		"files": [
 			"dist/**/*",
 			"electron/**/*",
-			"package.json",
-			"!node_modules/**/*"
+			"package.json"
+		],
+		"publish": [
+			{
+				"provider": "github",
+				"owner": "srsergi0",
+				"repo": "markdown-reader"
+			}
 		],
 		"fileAssociations": [
 			{

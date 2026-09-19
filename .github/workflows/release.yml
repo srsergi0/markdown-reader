@@ -35,6 +35,8 @@ jobs:
           path: |
             artifacts/*.exe
             artifacts/*.zip
+            artifacts/*.yml
+            artifacts/*.blockmap
 
   build-macos:
     runs-on: macos-latest
@@ -59,6 +61,8 @@ jobs:
           path: |
             artifacts/*.dmg
             artifacts/*.zip
+            artifacts/*.yml
+            artifacts/*.blockmap
 
   build-linux:
     runs-on: ubuntu-latest
@@ -81,6 +85,8 @@ jobs:
           path: |
             artifacts/*.AppImage
             artifacts/*.tar.gz
+            artifacts/*.yml
+            artifacts/*.blockmap
 
   release:
     needs: [build-windows, build-macos, build-linux]

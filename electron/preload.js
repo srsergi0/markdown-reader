@@ -16,9 +16,17 @@ const REQUEST_CHANNELS = [
 	"searchInFolder",
 	"saveHtml",
 	"openExternalUrl",
+	"update:check",
+	"update:download",
+	"update:install",
 ];
 
-const EVENT_CHANNELS = ["initialFile", "fileChanged", "folderChanged"];
+const EVENT_CHANNELS = [
+	"initialFile",
+	"fileChanged",
+	"folderChanged",
+	"update:status",
+];
 
 contextBridge.exposeInMainWorld("markdownReader", {
 	invoke: (channel, params) => {
