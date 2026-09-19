@@ -96,6 +96,7 @@ function App() {
   const [tabErrors, setTabErrors] = useState<Record<string, string>>({});
   const electroviewRef = useRef<any>(null);
   const activeTabRef = useRef<string | null>(null);
+  const isEditingRef = useRef(false);
   const dragCounterRef = useRef(0);
   const watchedFolderRef = useRef<string | null>(null);
   const lastFolderPath = useRef<string | null>(null);
@@ -103,6 +104,7 @@ function App() {
   const loadingTabsRef = useRef<Set<string>>(new Set());
 
   activeTabRef.current = activeTabId;
+  isEditingRef.current = isEditing;
   tabContentsRef.current = tabContents;
 
   const darkThemes = useMemo<ThemeId[]>(() => [
@@ -144,10 +146,10 @@ function App() {
   }, [themeId, isDark]);
 
   useEffect(() => {
+    // Remember the workspace path when the sidebar closes, but keep the
+    // folder watcher running so the file tree stays fresh in the background.
     if (!sidebarOpen && watchedFolderRef.current) {
       lastFolderPath.current = watchedFolderRef.current;
-      watchedFolderRef.current = null;
-      electroviewRef.current?.proxy.request.stopWatchingFolder({}).catch(() => {});
     }
   }, [sidebarOpen]);
 
@@ -215,7 +217,9 @@ function App() {
     const unsubscribeFileChanged = desktop.on("fileChanged", ({ path, content }) => {
       setTabs((prev) => {
         const tab = prev.find((t) => t.path === path);
-        if (tab && tab.id === activeTabRef.current) {
+        // Keep every tab in sync with disk, but never clobber the tab the
+        // user is actively editing (would discard unsaved changes).
+        if (tab && !(isEditingRef.current && tab.id === activeTabRef.current)) {
           setTabContents((c) => ({ ...c, [tab.id]: content }));
         }
         return prev;
@@ -243,10 +247,7 @@ function App() {
             setSidebarFiles(files);
             watchedFolderRef.current = folderPath;
             lastFolderPath.current = folderPath;
-            
-            if (sidebarOpen) {
-              desktop.proxy.request.startWatchingFolder({ path: folderPath }).catch(() => {});
-            }
+            desktop.proxy.request.startWatchingFolder({ path: folderPath }).catch(() => {});
           } catch (e) {
             console.error("Failed to restore folder files:", e);
           }
@@ -631,12 +632,14 @@ function App() {
             setSidebarOpen(next);
             if (next) {
               if (isNarrowViewport()) setSearchOpen(false);
-              if (lastFolderPath.current && !watchedFolderRef.current) {
-                const view = electroviewRef.current;
-                if (view) {
-                  watchedFolderRef.current = lastFolderPath.current;
-                  view.proxy.request.startWatchingFolder({ path: lastFolderPath.current }).catch(() => {});
-                }
+              const folder = lastFolderPath.current || watchedFolderRef.current;
+              const view = electroviewRef.current;
+              if (folder && view) {
+                watchedFolderRef.current = folder;
+                lastFolderPath.current = folder;
+                // Refresh the tree and make sure the folder watcher is active.
+                view.proxy.request.readFolder({ path: folder }).then(setSidebarFiles).catch(() => {});
+                view.proxy.request.startWatchingFolder({ path: folder }).catch(() => {});
               }
             }
           }}

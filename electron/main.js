@@ -133,6 +133,7 @@ const indexer = new SearchIndexer();
 
 let currentWatcher = null;
 let currentWatchedPath = null;
+let fileChangeTimeout = null;
 let currentFolderWatcher = null;
 let currentWatchedFolder = null;
 let folderRescanTimeout = null;
@@ -171,6 +172,10 @@ function stopFileWatcher() {
 	if (currentWatcher) {
 		currentWatcher.close();
 		currentWatcher = null;
+	}
+	if (fileChangeTimeout) {
+		clearTimeout(fileChangeTimeout);
+		fileChangeTimeout = null;
 	}
 	currentWatchedPath = null;
 }
@@ -261,17 +266,32 @@ function registerIpcHandlers() {
 		if (currentWatchedPath === filePath && currentWatcher) return {};
 		stopFileWatcher();
 		currentWatchedPath = filePath;
+
+		const dir = path.dirname(filePath);
+		const base = path.basename(filePath);
+
+		const notify = () => {
+			if (fileChangeTimeout) clearTimeout(fileChangeTimeout);
+			fileChangeTimeout = setTimeout(async () => {
+				try {
+					const content = await fsp.readFile(filePath, "utf8");
+					indexer.indexFile(filePath, base);
+					sendToRenderer("fileChanged", { path: filePath, content });
+				} catch {
+					// file might be temporarily unreadable or being replaced
+				}
+			}, 120);
+		};
+
 		try {
-			currentWatcher = fs.watch(filePath, () => {
-				void (async () => {
-					try {
-						const content = await fsp.readFile(filePath, "utf8");
-						indexer.indexFile(filePath, path.basename(filePath));
-						sendToRenderer("fileChanged", { path: filePath, content });
-					} catch {
-						// file might be temporarily unreadable
-					}
-				})();
+			// Watch the parent directory rather than the file itself: editors
+			// often save atomically (write temp + rename over), which would
+			// invalidate a watcher attached to the old file.
+			currentWatcher = fs.watch(dir, (_eventType, filename) => {
+				if (filename && filename.toString() === base) notify();
+			});
+			currentWatcher.on("error", (err) => {
+				console.error("File watcher error:", err);
 			});
 		} catch (err) {
 			console.error("Failed to watch file:", err);
@@ -311,7 +331,7 @@ function registerIpcHandlers() {
 				} catch {
 					// ignore
 				}
-			}, 400);
+			}, 250);
 		};
 
 		try {
@@ -319,17 +339,24 @@ function registerIpcHandlers() {
 				folderPath,
 				{ recursive: true },
 				(_eventType, filename) => {
-					if (!filename) return;
-					const fullPath = path.join(folderPath, filename);
-					const name = filename.toLowerCase();
-					if (name.endsWith(".md") || name.endsWith(".markdown")) {
-						indexer.indexFile(fullPath, path.basename(filename));
-						rescan();
-					} else if (_eventType === "rename") {
-						rescan();
+					if (filename) {
+						const name = filename.toLowerCase();
+						if (name.endsWith(".md") || name.endsWith(".markdown")) {
+							indexer
+								.indexFile(
+									path.join(folderPath, filename),
+									path.basename(filename),
+								)
+								.catch(() => {});
+						}
 					}
+					// Always rescan so created/removed files and folders appear.
+					rescan();
 				},
 			);
+			currentFolderWatcher.on("error", (err) => {
+				console.error("Folder watcher error:", err);
+			});
 		} catch (err) {
 			console.error("Failed to watch folder:", err);
 		}

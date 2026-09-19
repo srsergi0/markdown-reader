@@ -1,6 +1,6 @@
 {
 	"name": "markdown-reader",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "Native Markdown reader with file association support",
 	"author": "srsergi0",
 	"main": "electron/main.js",
