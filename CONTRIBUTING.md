@@ -15,28 +15,33 @@ cd markdown-reader
 # Install dependencies
 bun install
 
-# Start development with HMR
-bun run dev:hmr
+# Start development (Vite dev server + Electron)
+bun run dev
 ```
 
 ## Project Structure
 
 ```
+electron/
+├── main.js        # Electron main process (window, IPC, file watching, export)
+└── preload.js     # contextBridge API exposed to the renderer
+
 src/
-├── bun/           # Main process (Electrobun/Bun runtime)
-├── mainview/      # React UI (components, styles)
-└── shared/        # Shared types between main and renderer
+├── mainview/      # React UI (components, styles, desktop bridge)
+└── shared/        # Shared types and print/HTML builders
 ```
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `bun run dev` | Dev without HMR |
-| `bun run dev:hmr` | Dev with hot module replacement |
-| `bun run build` | Production build |
-| `bun run build:canary` | Canary build |
-| `bun run build:installer` | Build + Windows installer |
+| `bun run dev` | Vite dev server + Electron with HMR |
+| `bun run build` | Build the renderer (Vite) |
+| `bun run typecheck` | Type-check with `tsc` |
+| `bun run dist` | Package the app for the current OS |
+| `bun run dist:win` | Package for Windows |
+| `bun run dist:mac` | Package for macOS |
+| `bun run dist:linux` | Package for Linux |
 
 ## Submitting Changes
 
@@ -56,7 +61,7 @@ src/
 ## Reporting Issues
 
 - Use GitHub Issues
-- Include OS, Electrobun version, and steps to reproduce
+- Include OS, Electron version, and steps to reproduce
 - Screenshots welcome
 
 ## License

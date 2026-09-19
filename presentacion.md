@@ -30,21 +30,23 @@ Here is a quick overview of standard text styling:
 
 ## 💻 Developer Tools & Code Syntax
 
-Below is a modern TypeScript snippet showing how lightweight our event bridge system is:
+Below is a modern TypeScript snippet showing how lightweight our IPC bridge is:
 
 ```typescript
-import { App } from 'electrobun';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import { watch } from 'node:fs';
 
-const app = new App({
-  name: "Markdown Reader",
-  onReady: () => {
-    console.log("🚀 Application is ready to render views!");
-  }
-});
+app.whenReady().then(() => {
+  const win = new BrowserWindow({
+    webPreferences: { preload: `${__dirname}/preload.js` },
+  });
 
-// Register file watch listener
-app.watchFile("./document.md", (changeType) => {
-  app.views.main.send("file-changed", changeType);
+  // Register a file watch listener
+  watch('./document.md', () => {
+    win.webContents.send('file-changed', './document.md');
+  });
+
+  win.loadFile('dist/index.html');
 });
 ```
 

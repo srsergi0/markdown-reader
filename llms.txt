@@ -1,24 +1,33 @@
-# Electrobun Project
+# Electron Project
 
-This is an Electrobun desktop application.
+This is an Electron desktop application.
 
-IMPORTANT: Electrobun is NOT Electron. Do not use Electron APIs or patterns.
+## Architecture
 
-## Documentation
-
-Full API reference: https://blackboard.sh/electrobun/llms.txt
-Getting started: https://blackboard.sh/electrobun/docs/
+- **Main process:** `electron/main.js` (Node.js/Electron APIs). Owns the window,
+  file dialogs, file watchers, search index, PDF/HTML export and file associations.
+- **Preload:** `electron/preload.js` exposes a safe `window.markdownReader` bridge
+  (`invoke` + `on`) through `contextBridge`.
+- **Renderer:** React app in `src/mainview`, built by Vite into `dist/`.
+  It talks to the main process through `src/mainview/desktop.ts`.
 
 ## Quick Reference
 
-Import patterns:
-- Main process (Bun): `import { BrowserWindow } from "electrobun/bun"`
-- Browser context: `import { Electroview } from "electrobun/view"`
+- Create windows with `new BrowserWindow({ webPreferences: { preload } })`.
+- Register request handlers with `ipcMain.handle(channel, handler)`.
+- Call them from the renderer via `window.markdownReader.invoke(channel, params)`.
+- Main-to-renderer events use `webContents.send(channel, payload)` and are
+  subscribed with `window.markdownReader.on(channel, listener)`.
+- Only channels listed in `electron/preload.js` are allowed.
+- Context isolation is enabled; Node integration is disabled in the renderer.
 
-Use `views://` URLs to load bundled assets (e.g., `url: "views://mainview/index.html"`).
-Views must be configured in `electrobun.config.ts` to be built and copied into the bundle.
+## Scripts
 
-## About
+- `bun run dev` - Vite dev server + Electron with HMR.
+- `bun run build` - Build the renderer with Vite.
+- `bun run dist` - Package the app with electron-builder (output in `artifacts/`).
 
-Electrobun is built by Blackboard (https://blackboard.sh), an innovation lab building
-tools and funding teams that define the next generation of technology.
+## Documentation
+
+Electron API reference: https://www.electronjs.org/docs/latest/
+electron-builder: https://www.electron.build/

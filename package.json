@@ -1,16 +1,19 @@
 {
 	"name": "markdown-reader",
-	"version": "1.0.2",
+	"version": "2.0.0",
 	"description": "Native Markdown reader with file association support",
+	"author": "srsergi0",
+	"main": "electron/main.js",
 	"scripts": {
-		"start": "vite build && electrobun dev",
-		"dev": "electrobun dev --watch",
-		"dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
-		"hmr": "vite --port 5173",
-		"build:canary": "vite build && electrobun build --env=canary",
-		"fix-icons": "powershell -ExecutionPolicy Bypass -File scripts/fix-icons.ps1",
-		"register": "powershell -ExecutionPolicy Bypass -File scripts/register-dev.ps1",
-		"build:prod": "vite build && electrobun build --env=stable && powershell -ExecutionPolicy Bypass -File scripts/fix-icons.ps1"
+		"dev": "concurrently -k -n VITE,ELECTRON -c cyan,magenta \"vite\" \"electron .\"",
+		"start": "vite build && electron .",
+		"build": "vite build",
+		"typecheck": "tsc --noEmit",
+		"dist": "vite build && electron-builder",
+		"dist:win": "vite build && electron-builder --win",
+		"dist:mac": "vite build && electron-builder --mac",
+		"dist:linux": "vite build && electron-builder --linux",
+		"register": "powershell -ExecutionPolicy Bypass -File scripts/register-dev.ps1"
 	},
 	"dependencies": {
 		"@blocknote/core": "^0.51.4",
@@ -18,11 +21,9 @@
 		"@blocknote/react": "^0.51.4",
 		"@mantine/core": "^8.3.11",
 		"@mantine/hooks": "^8.3.11",
-		"electrobun": "1.18.1",
 		"gray-matter": "^4.0.3",
 		"lucide-react": "^1.18.0",
 		"mermaid": "^11.15.0",
-		"puppeteer-core": "^25.1.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-markdown": "^10.1.0",
@@ -37,13 +38,56 @@
 		"@types/bun": "latest",
 		"@types/react": "^18.3.12",
 		"@types/react-dom": "^18.3.1",
+		"@types/react-syntax-highlighter": "^15.5.13",
 		"@vitejs/plugin-react": "^4.3.4",
 		"autoprefixer": "^10.4.20",
 		"concurrently": "^9.1.0",
+		"electron": "^44.2.0",
+		"electron-builder": "^26.15.3",
 		"postcss": "^8.4.49",
+		"puppeteer-core": "^25.1.0",
 		"tailwindcss": "^3.4.16",
-		"@types/react-syntax-highlighter": "^15.5.13",
 		"typescript": "^5.7.2",
-		"vite": "^6.0.3"
+		"vite": "^6.0.3",
+		"yallist": "^3.1.1"
+	},
+	"build": {
+		"appId": "com.srsergi0.markdownreader",
+		"productName": "Markdown Reader",
+		"directories": {
+			"output": "artifacts"
+		},
+		"files": [
+			"dist/**/*",
+			"electron/**/*",
+			"package.json",
+			"!node_modules/**/*"
+		],
+		"fileAssociations": [
+			{
+				"ext": ["md", "markdown"],
+				"name": "Markdown Document",
+				"role": "Viewer"
+			}
+		],
+		"win": {
+			"target": ["nsis", "zip"],
+			"icon": "src/assets/icon.png"
+		},
+		"nsis": {
+			"oneClick": false,
+			"allowToChangeInstallationDirectory": true,
+			"perMachine": false
+		},
+		"mac": {
+			"target": ["dmg", "zip"],
+			"icon": "src/assets/icon.png",
+			"category": "public.app-category.productivity"
+		},
+		"linux": {
+			"target": ["AppImage", "tar.gz"],
+			"icon": "src/assets/icon.png",
+			"category": "Office"
+		}
 	}
 }

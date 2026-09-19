@@ -2,7 +2,7 @@
 
 # ⚡️ Markdown Reader
 
-### **The Ultra-Fast, Anti-Electron Markdown Viewer**
+### **The Fast, Local-First Markdown Viewer**
 
 `50ms startup` // `14MB binary` // `24MB RAM` // `100% Local & Private`
 
@@ -27,14 +27,14 @@
 
 ## 🚀 The Performance Showdown
 
-Why run a full instance of Chrome just to read a text file? Markdown Reader uses the operating system's native WebView, making it incredibly lightweight compared to standard editors.
+Why open a heavy editor just to read a text file? Markdown Reader is a focused, distraction-free desktop app built on Electron, so it runs consistently across Windows, macOS and Linux.
 
 | Metric | ⚡️ Markdown Reader | 📓 Obsidian | 🟦 VS Code |
 | :--- | :--- | :--- | :--- |
 | **Startup Time** | **< 50ms** | ~ 3.2s | ~ 2.1s |
 | **RAM Idle** | **~ 24 MB** | ~ 310 MB | ~ 240 MB |
 | **Binary Size** | **~ 14 MB** | ~ 280 MB | ~ 350 MB |
-| **Engine** | Native WebView | Chromium (Electron) | Chromium (Electron) |
+| **Engine** | Electron (Chromium) | Chromium (Electron) | Chromium (Electron) |
 
 ---
 
@@ -74,10 +74,11 @@ bun install && bun run dev
 
 ## 🛠 Tech Stack
 
-*   **Runtime:** [Bun](https://bun.sh)
-*   **Engine:** [Electrobun](https://blackboard.sh/electrobun)
+*   **Runtime:** [Node.js](https://nodejs.org) / [Bun](https://bun.sh)
+*   **Engine:** [Electron](https://www.electronjs.org)
 *   **Frontend UI:** [React](https://react.dev) + [Tailwind CSS](https://tailwindcss.com)
 *   **Build Server:** [Vite](https://vitejs.dev)
+*   **Packaging:** [electron-builder](https://www.electron.build)
 
 ---
 

@@ -1,25 +1,29 @@
 # Register .md file association for development
 # Run as Administrator: powershell -ExecutionPolicy Bypass -File scripts/register-dev.ps1
 
-$appPath = "$PSScriptRoot\..\node_modules\.bin\electrobun.cmd"
+$projectRoot = Resolve-Path "$PSScriptRoot\.."
+$devElectron = Join-Path $projectRoot "node_modules\.bin\electron.cmd"
 
-if (-not (Test-Path $appPath)) {
-  # Try to find the app exe in the build output
-  $possiblePaths = @(
-    "$PSScriptRoot\..\dist\MarkdownReader.exe",
-    "$PSScriptRoot\..\dist\markdown-reader.exe"
-  )
-  foreach ($p in $possiblePaths) {
-    if (Test-Path $p) {
-      $appPath = $p
-      break
-    }
-  }
+$builtApp = $null
+$possiblePaths = @(
+  (Join-Path $projectRoot "artifacts\win-unpacked\Markdown Reader.exe"),
+  (Join-Path $projectRoot "artifacts\win-unpacked\MarkdownReader.exe"),
+  (Join-Path $projectRoot "artifacts\win-unpacked\markdown-reader.exe")
+)
+foreach ($p in $possiblePaths) {
+  if (Test-Path $p) { $builtApp = $p; break }
 }
 
-if (-not (Test-Path $appPath)) {
-  Write-Host "Warning: Could not find app executable. Registering anyway with placeholder path." -ForegroundColor Yellow
-  Write-Host "After building, update the path in registry or re-run this script." -ForegroundColor Yellow
+if ($builtApp) {
+  $openCommand = "`"$builtApp`" `"%1`""
+  $iconPath = "$builtApp,0"
+} elseif (Test-Path $devElectron) {
+  $openCommand = "`"$devElectron`" `"$projectRoot`" `"%1`""
+  $iconPath = "$devElectron,0"
+} else {
+  Write-Host "Warning: Could not find Electron. Run 'bun install' first." -ForegroundColor Yellow
+  $openCommand = "`"$devElectron`" `"$projectRoot`" `"%1`""
+  $iconPath = "$devElectron,0"
 }
 
 $progId = "MarkdownReader.md"
@@ -31,11 +35,11 @@ New-ItemProperty -Path "HKCU:\Software\Classes\$progId" -Name "" -Value $appName
 
 # Default icon
 New-Item -Path "HKCU:\Software\Classes\$progId\DefaultIcon" -Force | Out-Null
-New-ItemProperty -Path "HKCU:\Software\Classes\$progId\DefaultIcon" -Name "" -Value "`"$appPath`",1" -Force | Out-Null
+New-ItemProperty -Path "HKCU:\Software\Classes\$progId\DefaultIcon" -Name "" -Value $iconPath -Force | Out-Null
 
 # Open command
 New-Item -Path "HKCU:\Software\Classes\$progId\shell\open\command" -Force | Out-Null
-New-ItemProperty -Path "HKCU:\Software\Classes\$progId\shell\open\command" -Name "" -Value "`"$appPath`" `"%1`"" -Force | Out-Null
+New-ItemProperty -Path "HKCU:\Software\Classes\$progId\shell\open\command" -Name "" -Value $openCommand -Force | Out-Null
 
 # Associate .md extension
 New-Item -Path "HKCU:\Software\Classes\.md" -Force | Out-Null

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef, createContext, useContext, useMemo } from "react";
-import { Electroview } from "electrobun/view";
-import type { MarkdownReaderRPC, FileEntry } from "../shared/types";
+import type { FileEntry } from "../shared/types";
+import { desktop } from "./desktop";
+import { buildPrintHTML, buildStandaloneHTML } from "../shared/buildPrintHTML";
 import MarkdownViewer from "./components/MarkdownViewer";
 import MarkdownEditor from "./components/MarkdownEditor";
 import TopBar from "./components/TopBar";
@@ -156,43 +157,37 @@ function App() {
   }, [tabs, activeTabId, sidebarOpen, isEditing, workspacePath]);
 
   useEffect(() => {
-    const rpc = Electroview.defineRPC<MarkdownReaderRPC>({
-      maxRequestTime: 30000,
-      handlers: {
-        requests: {},
-        messages: {
-          initialFile: ({ path, content, filename }) => {
-            const id = `tab-${++tabCounter}`;
-            setTabs((prev) => {
-              const existing = prev.find((t) => t.path === path);
-              if (existing) {
-                setActiveTabId(existing.id);
-                setTabContents((c) => ({ ...c, [existing.id]: content }));
-                return prev;
-              }
-              return [...prev, { id, path, filename }];
-            });
-            setActiveTabId(id);
-            setTabContents((prev) => ({ ...prev, [id]: content }));
-            electroviewRef.current?.proxy.request.startWatching({ path });
-          },
-          fileChanged: ({ path, content }) => {
-            setTabs((prev) => {
-              const tab = prev.find((t) => t.path === path);
-              if (tab && tab.id === activeTabRef.current) {
-                setTabContents((c) => ({ ...c, [tab.id]: content }));
-              }
-              return prev;
-            });
-          },
-          folderChanged: ({ files }) => {
-            setSidebarFiles(files);
-          },
-        },
-      },
+    electroviewRef.current = desktop;
+
+    const openInitialFile = ({ path, content, filename }: { path: string; content: string; filename: string }) => {
+      const id = `tab-${++tabCounter}`;
+      setTabs((prev) => {
+        const existing = prev.find((t) => t.path === path);
+        if (existing) {
+          setActiveTabId(existing.id);
+          setTabContents((c) => ({ ...c, [existing.id]: content }));
+          return prev;
+        }
+        return [...prev, { id, path, filename }];
+      });
+      setActiveTabId(id);
+      setTabContents((prev) => ({ ...prev, [id]: content }));
+      desktop.proxy.request.startWatching({ path });
+    };
+
+    const unsubscribeInitialFile = desktop.on("initialFile", openInitialFile);
+    const unsubscribeFileChanged = desktop.on("fileChanged", ({ path, content }) => {
+      setTabs((prev) => {
+        const tab = prev.find((t) => t.path === path);
+        if (tab && tab.id === activeTabRef.current) {
+          setTabContents((c) => ({ ...c, [tab.id]: content }));
+        }
+        return prev;
+      });
     });
-    new Electroview({ rpc });
-    electroviewRef.current = rpc;
+    const unsubscribeFolderChanged = desktop.on("folderChanged", ({ files }) => {
+      setSidebarFiles(files);
+    });
 
     // Load content for restored tabs and set up watchers
     const initRestoredSession = async () => {
@@ -201,13 +196,13 @@ function App() {
 
         if (folderPath) {
           try {
-            const files = await rpc.proxy.request.readFolder({ path: folderPath });
+            const files = await desktop.proxy.request.readFolder({ path: folderPath });
             setSidebarFiles(files);
             watchedFolderRef.current = folderPath;
             lastFolderPath.current = folderPath;
             
             if (sidebarOpen) {
-              rpc.proxy.request.startWatchingFolder({ path: folderPath }).catch(() => {});
+              desktop.proxy.request.startWatchingFolder({ path: folderPath }).catch(() => {});
             }
           } catch (e) {
             console.error("Failed to restore folder files:", e);
@@ -219,7 +214,7 @@ function App() {
           await Promise.all(
             savedTabs.map(async (tab: any) => {
               try {
-                const res = await rpc.proxy.request.getFileContent({ path: tab.path });
+                const res = await desktop.proxy.request.getFileContent({ path: tab.path });
                 if (res) {
                   contents[tab.id] = res.content;
                 }
@@ -235,10 +230,17 @@ function App() {
           if (savedActiveTabId && activeTabRef.current === savedActiveTabId) {
             const activeTab = savedTabs.find((t: any) => t.id === savedActiveTabId);
             if (activeTab) {
-              rpc.proxy.request.startWatching({ path: activeTab.path }).catch(() => {});
+              desktop.proxy.request.startWatching({ path: activeTab.path }).catch(() => {});
             }
           }
         }
+      }
+
+      try {
+        const initial = await desktop.proxy.request.getInitialFile();
+        if (initial) openInitialFile(initial);
+      } catch (e) {
+        console.error("Failed to load initial file:", e);
       }
     };
 
@@ -283,8 +285,11 @@ function App() {
     checkForUpdates();
 
     return () => {
-      rpc.proxy.request.stopWatchingFolder({}).catch(() => {});
-      rpc.proxy.request.stopWatching({}).catch(() => {});
+      unsubscribeInitialFile();
+      unsubscribeFileChanged();
+      unsubscribeFolderChanged();
+      desktop.proxy.request.stopWatchingFolder({}).catch(() => {});
+      desktop.proxy.request.stopWatching({}).catch(() => {});
     };
   }, []);
 
@@ -432,10 +437,10 @@ function App() {
       const view = electroviewRef.current;
       if (!view) return;
       try {
+        const html = await buildPrintHTML(activeContent, options);
         await view.proxy.request.savePdf({
-          markdown: activeContent,
+          html,
           filename: activeFile?.filename || "document.md",
-          options,
         });
       } catch (err) {
         console.error("Save PDF failed:", err);
@@ -449,8 +454,9 @@ function App() {
     const view = electroviewRef.current;
     if (!view) return;
     try {
+      const html = await buildStandaloneHTML(activeContent);
       await view.proxy.request.saveHtml({
-        markdown: activeContent,
+        html,
         filename: activeFile?.filename || "document.md",
       });
       setToastMsg("HTML exported!");
