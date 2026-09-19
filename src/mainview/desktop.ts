@@ -3,6 +3,7 @@ import type { FileEntry } from "../shared/types";
 type DesktopBridge = {
 	invoke: (channel: string, params?: unknown) => Promise<any>;
 	on: (channel: string, listener: (payload: any) => void) => () => void;
+	getPathForFile?: (file: File) => string;
 };
 
 declare global {
@@ -16,6 +17,7 @@ const bridge: DesktopBridge = window.markdownReader ?? {
 		throw new Error("Desktop bridge unavailable (running outside Electron).");
 	},
 	on: () => () => {},
+	getPathForFile: () => "",
 };
 
 export type SearchResult = {
@@ -63,6 +65,10 @@ export const desktop = {
 				path: string;
 			}): Promise<{ content: string; filename: string }> =>
 				bridge.invoke("getFileContent", params),
+			getPathInfo: (params: {
+				path: string;
+			}): Promise<{ exists: boolean; isDirectory: boolean; isFile: boolean }> =>
+				bridge.invoke("getPathInfo", params),
 			resolvePath: (params: {
 				basePath: string;
 				relativePath: string;
@@ -116,4 +122,5 @@ export const desktop = {
 		channel: "initialFile" | "fileChanged" | "folderChanged" | "update:status",
 		listener: (payload: any) => void,
 	) => bridge.on(channel, listener),
+	getPathForFile: (file: File): string => bridge.getPathForFile?.(file) ?? "",
 };

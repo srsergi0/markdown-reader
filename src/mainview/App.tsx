@@ -12,7 +12,7 @@ import SearchPanel from "./components/SearchPanel";
 import Toast from "./components/Toast";
 import UpdateToast from "./components/UpdateToast";
 import { printMarkdown, type PrintOptions } from "./utils/print";
-import { Upload } from "lucide-react";
+import { Upload, AlertTriangle } from "lucide-react";
 
 export type ThemeId =
   | "github-light"
@@ -93,13 +93,17 @@ function App() {
   const [hasFolder, setHasFolder] = useState<boolean>(() => !!savedSession?.folderPath);
   const [workspacePath, setWorkspacePath] = useState<string | null>(() => savedSession?.folderPath || null);
   const [scrollTarget, setScrollTarget] = useState<{ path: string; line: number; timestamp: number } | null>(null);
+  const [tabErrors, setTabErrors] = useState<Record<string, string>>({});
   const electroviewRef = useRef<any>(null);
   const activeTabRef = useRef<string | null>(null);
   const dragCounterRef = useRef(0);
   const watchedFolderRef = useRef<string | null>(null);
   const lastFolderPath = useRef<string | null>(null);
+  const tabContentsRef = useRef(tabContents);
+  const loadingTabsRef = useRef<Set<string>>(new Set());
 
   activeTabRef.current = activeTabId;
+  tabContentsRef.current = tabContents;
 
   const darkThemes = useMemo<ThemeId[]>(() => [
     "one-dark",
@@ -146,6 +150,33 @@ function App() {
       electroviewRef.current?.proxy.request.stopWatchingFolder({}).catch(() => {});
     }
   }, [sidebarOpen]);
+
+  // Fetch a tab's content on demand (used for restored tabs and lazy loading
+  // when a restored tab is selected but its content was never loaded).
+  const loadTabContent = useCallback(async (tab: Tab) => {
+    if (tabContentsRef.current[tab.id] !== undefined) return;
+    if (loadingTabsRef.current.has(tab.id)) return;
+    loadingTabsRef.current.add(tab.id);
+    try {
+      const res = await desktop.proxy.request.getFileContent({ path: tab.path });
+      if (res) {
+        setTabContents((prev) => ({ ...prev, [tab.id]: res.content }));
+        setTabErrors((prev) => {
+          if (!(tab.id in prev)) return prev;
+          const { [tab.id]: _removed, ...rest } = prev;
+          return rest;
+        });
+      }
+    } catch (e) {
+      console.error("Failed to load file content:", tab.path, e);
+      setTabErrors((prev) => ({
+        ...prev,
+        [tab.id]: (e as Error)?.message || String(e),
+      }));
+    } finally {
+      loadingTabsRef.current.delete(tab.id);
+    }
+  }, []);
 
   // Save session when relevant states change
   useEffect(() => {
@@ -222,25 +253,11 @@ function App() {
         }
 
         if (savedTabs && savedTabs.length > 0) {
-          const contents: Record<string, string> = {};
-          await Promise.all(
-            savedTabs.map(async (tab: any) => {
-              try {
-                const res = await desktop.proxy.request.getFileContent({ path: tab.path });
-                if (res) {
-                  contents[tab.id] = res.content;
-                }
-              } catch (e) {
-                console.error("Failed to restore tab content:", tab.path, e);
-              }
-            })
-          );
-          
-          setTabContents((prev) => ({ ...contents, ...prev }));
+          await Promise.all(savedTabs.map((tab: Tab) => loadTabContent(tab)));
 
           // Watch active file, only if it's still the active tab
           if (savedActiveTabId && activeTabRef.current === savedActiveTabId) {
-            const activeTab = savedTabs.find((t: any) => t.id === savedActiveTabId);
+            const activeTab = savedTabs.find((t: Tab) => t.id === savedActiveTabId);
             if (activeTab) {
               desktop.proxy.request.startWatching({ path: activeTab.path }).catch(() => {});
             }
@@ -365,6 +382,10 @@ function App() {
         const { [tabId]: _, ...rest } = prev;
         return rest;
       });
+      setTabErrors((prev) => {
+        const { [tabId]: _removed, ...rest } = prev;
+        return rest;
+      });
     },
     [activeTabId],
   );
@@ -380,8 +401,11 @@ function App() {
         view.proxy.request.stopWatching({});
         view.proxy.request.startWatching({ path: tab.path });
       }
+      if (tabContentsRef.current[tabId] === undefined) {
+        loadTabContent(tab);
+      }
     },
-    [tabs],
+    [tabs, loadTabContent],
   );
 
   const handleToggleEdit = useCallback(() => {
@@ -543,89 +567,53 @@ function App() {
       dragCounterRef.current = 0;
       setIsDragOver(false);
 
-      const items = Array.from(e.dataTransfer.items);
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      if (droppedFiles.length === 0) return;
 
-      for (const item of items) {
-        const entry = (item as any).webkitGetAsEntry?.() as FileSystemEntry | null;
-        if (!entry) continue;
+      for (const file of droppedFiles) {
+        const absPath = desktop.getPathForFile(file);
+        if (!absPath) continue;
 
-        if (entry.isDirectory) {
-          const buildTree = async (
-            dirEntry: FileSystemDirectoryEntry,
-          ): Promise<FileEntry[]> => {
-            const reader = dirEntry.createReader();
-            const allEntries: FileSystemEntry[] = [];
-            await new Promise<void>((resolve) => {
-              const readBatch = () => {
-                reader.readEntries((batch) => {
-                  if (batch.length === 0) resolve();
-                  else { allEntries.push(...Array.from(batch)); readBatch(); }
-                });
-              };
-              readBatch();
-            });
+        const info = await desktop.proxy.request.getPathInfo({ path: absPath });
+        if (!info.exists) continue;
 
-            const result: FileEntry[] = [];
-            for (const e of allEntries) {
-              if (e.isFile) {
-                const name = e.name.toLowerCase();
-                if (name.endsWith(".md") || name.endsWith(".markdown")) {
-                  const file = await new Promise<File>((resolve) =>
-                    (e as FileSystemFileEntry).file(resolve),
-                  );
-                  const content = await file.text();
-                  result.push({
-                    name: e.name,
-                    isDirectory: false,
-                    path: e.name,
-                    content,
-                  });
-                }
-              } else if (e.isDirectory) {
-                if (e.name === "node_modules" || e.name.startsWith(".")) {
-                  continue;
-                }
-                const children = await buildTree(e as FileSystemDirectoryEntry);
-                result.push({
-                  name: e.name,
-                  isDirectory: true,
-                  path: e.name,
-                  children,
-                });
-              }
-            }
-            result.sort((a, b) => {
-              if (a.isDirectory && !b.isDirectory) return -1;
-              if (!a.isDirectory && b.isDirectory) return 1;
-              return a.name.localeCompare(b.name);
-            });
-            return result;
-          };
-
-          const tree = await buildTree(entry as FileSystemDirectoryEntry);
-          electroviewRef.current?.proxy.request.stopWatchingFolder({});
-          watchedFolderRef.current = null;
-          lastFolderPath.current = null;
-          setHasFolder(false);
-          setWorkspacePath(null);
-          setSidebarFiles([{ name: entry.name, isDirectory: true, path: entry.name, children: tree }]);
+        if (info.isDirectory) {
+          await desktop.proxy.request.stopWatchingFolder({});
+          const files = await desktop.proxy.request.readFolder({ path: absPath });
+          setSidebarFiles(files);
           setSidebarOpen(true);
-        } else {
-          const file = (entry as FileSystemFileEntry);
-          const name = file.name.toLowerCase();
-          if (name.endsWith(".md") || name.endsWith(".markdown")) {
-            const blob = await new Promise<File>((resolve) => file.file(resolve));
-            const text = await blob.text();
-            const id = `tab-${++tabCounter}`;
-            setTabs((prev) => [...prev, { id, path: file.name, filename: file.name }]);
-            setTabContents((prev) => ({ ...prev, [id]: text }));
-            setActiveTabId(id);
-          }
+          watchedFolderRef.current = absPath;
+          lastFolderPath.current = absPath;
+          setHasFolder(true);
+          setWorkspacePath(absPath);
+          desktop.proxy.request.startWatchingFolder({ path: absPath });
+          continue;
+        }
+
+        if (!info.isFile) continue;
+        const name = file.name.toLowerCase();
+        if (!name.endsWith(".md") && !name.endsWith(".markdown")) continue;
+
+        const existing = tabs.find((t) => t.path === absPath);
+        if (existing) {
+          setActiveTabId(existing.id);
+          continue;
+        }
+
+        try {
+          const res = await desktop.proxy.request.getFileContent({ path: absPath });
+          const id = `tab-${++tabCounter}`;
+          setTabs((prev) => [...prev, { id, path: absPath, filename: res.filename }]);
+          setTabContents((prev) => ({ ...prev, [id]: res.content }));
+          setActiveTabId(id);
+          desktop.proxy.request.startWatching({ path: absPath });
+        } catch (err) {
+          console.error("Failed to open dropped file:", absPath, err);
         }
       }
       setIsEditing(false);
     },
-    [],
+    [tabs],
   );
 
   return (
@@ -733,6 +721,33 @@ function App() {
             <main className="flex-1 overflow-auto">
               {activeFile && isEditing ? (
                 <MarkdownEditor content={activeContent} onSave={handleSave} />
+              ) : activeFile && !activeContent && tabErrors[activeFile.id] ? (
+                <div className="flex flex-col items-center justify-center h-full gap-3 px-6 text-center text-[var(--text-muted)]">
+                  <AlertTriangle className="w-12 h-12 text-amber-500" strokeWidth={1.5} />
+                  <p className="text-sm font-medium text-[var(--text-main)]">
+                    No se pudo abrir el archivo
+                  </p>
+                  <p className="text-xs break-all max-w-md font-mono">
+                    {activeFile.path}
+                  </p>
+                  <p className="text-xs max-w-md break-words">
+                    {tabErrors[activeFile.id]}
+                  </p>
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={() => loadTabContent(activeFile)}
+                      className="px-3 py-1.5 text-xs rounded-md border border-[var(--border-main)] text-[var(--text-main)] hover:bg-[var(--accent-hover)] transition-colors"
+                    >
+                      Reintentar
+                    </button>
+                    <button
+                      onClick={() => handleCloseTab(activeFile.id)}
+                      className="px-3 py-1.5 text-xs rounded-md bg-[var(--accent-blue)] text-white dark:text-[var(--bg-sidebar)] hover:opacity-90 transition-colors font-medium"
+                    >
+                      Cerrar pestaña
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <MarkdownViewer
                   content={activeContent}

@@ -240,6 +240,19 @@ function registerIpcHandlers() {
 		return { content, filename: path.basename(filePath) };
 	});
 
+	ipcMain.handle("getPathInfo", async (_event, { path: targetPath }) => {
+		try {
+			const stat = await fsp.stat(targetPath);
+			return {
+				exists: true,
+				isDirectory: stat.isDirectory(),
+				isFile: stat.isFile(),
+			};
+		} catch {
+			return { exists: false, isDirectory: false, isFile: false };
+		}
+	});
+
 	ipcMain.handle("resolvePath", async (_event, { basePath, relativePath }) => {
 		return path.resolve(path.dirname(basePath), relativePath);
 	});

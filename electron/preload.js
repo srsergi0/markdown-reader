@@ -1,10 +1,11 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 const REQUEST_CHANNELS = [
 	"getInitialFile",
 	"openFileDialog",
 	"openFolderDialog",
 	"getFileContent",
+	"getPathInfo",
 	"resolvePath",
 	"startWatching",
 	"stopWatching",
@@ -42,5 +43,12 @@ contextBridge.exposeInMainWorld("markdownReader", {
 		const wrapped = (_event, payload) => listener(payload);
 		ipcRenderer.on(channel, wrapped);
 		return () => ipcRenderer.removeListener(channel, wrapped);
+	},
+	getPathForFile: (file) => {
+		try {
+			return webUtils.getPathForFile(file);
+		} catch {
+			return "";
+		}
 	},
 });
